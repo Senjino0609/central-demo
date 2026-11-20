@@ -374,7 +374,8 @@
     .provider:hover,.row:hover,.cache-card:hover,.kpi:hover{transform:none}
   }
   .idx-head{display:flex;align-items:center;gap:8px}
-  .idx-head strong{font-size:12.5px;flex:1;min-width:0}
+  .idx-head strong{font-size:12.5px;flex:0 1 auto;min-width:0}
+  .idx-head .switch{margin-left:auto}
   .idx-head .switch{width:42px;height:24px}
   .idx-head .switch span::after{width:18px;height:18px}
   .idx-head .switch input:checked + span::after{transform:translateX(18px)}
@@ -775,8 +776,8 @@
                   <div class="bridge-name">
                     <span class="pmark pmark-xuper">X</span>
                     Xuper
+                    <span class="pulse bad" id="xuperLiveBadge" title="Consultando"></span>
                   </div>
-                  <span class="pulse bad" id="xuperLiveBadge" title="Consultando"></span>
                   <label class="switch" aria-label="Activar Xuper"><input type="checkbox" data-provider="xuper"><span></span></label>
                 </div>
                 <div class="xl-row">
