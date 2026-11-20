@@ -340,6 +340,26 @@
   .xl-tag.ok{color:#b9dcbf;background:rgba(134,192,143,.12);border-color:rgba(134,192,143,.3)}
   .xl-tag.warn{color:#ffd58a;background:rgba(240,164,94,.12);border-color:rgba(240,164,94,.3)}
   .xl-tag.bad{color:#ffb3c0;background:rgba(255,77,109,.10);border-color:rgba(255,77,109,.28)}
+  .prov-row{padding:10px 11px;gap:9px}
+  .prov-row .row-title{white-space:normal;line-height:1.25}
+  .prov-row .btn{padding:7px 9px;font-size:11px;flex:0 0 auto}
+  .prov-row .btn.danger{width:32px;padding:0;height:32px;justify-content:center}
+
+  /* ---------- movimiento ---------- */
+  :root{--ease-out:cubic-bezier(.23,1,.32,1)}
+  .view.active{animation:viewIn .22s var(--ease-out) both}
+  @keyframes viewIn{from{opacity:0}to{opacity:1}}
+  .reveal{opacity:0;transform:translateY(10px);transition:opacity .3s var(--ease-out),transform .3s var(--ease-out);transition-delay:var(--d,0ms)}
+  .reveal.in{opacity:1;transform:none}
+  @media (hover:hover) and (pointer:fine){
+    .provider:hover,.row:hover,.cache-card:hover{transform:translateY(-1px);transition:transform .15s var(--ease-out)}
+    .kpi:hover{transform:translateY(-1px);transition:transform .15s var(--ease-out)}
+  }
+  @media (prefers-reduced-motion:reduce){
+    .view.active{animation:none}
+    .reveal{opacity:1;transform:none;transition:none}
+    .provider:hover,.row:hover,.cache-card:hover,.kpi:hover{transform:none}
+  }
   .idx-head{display:flex;align-items:center;gap:8px}
   .idx-head strong{font-size:12.5px;flex:1;min-width:0}
   .idx-head .switch{width:42px;height:24px}
@@ -555,7 +575,6 @@
       <div class="statusband">
         <div class="statusband-top">
           <span class="eyebrow" style="margin:0">Estado</span>
-          <div class="hero-pill" id="heroBridgePill"><span class="dot" id="heroBridgeDot"></span><span id="heroBridgeText">Leyendo estado…</span></div>
         </div>
         <div class="status-strip" id="statusStrip"></div>
       </div>
@@ -584,7 +603,7 @@
       </div>
 
       <div class="section-head small">
-        <div><p class="eyebrow">Ahora</p><h2>Últimas actividades</h2></div>
+        <div><h2>Últimas actividades</h2></div>
         <button class="btn sm" data-go="ahora">Ver todo</button>
       </div>
       <div class="list" id="homeActivity"></div>
@@ -594,7 +613,7 @@
     <!-- AHORA -->
     <section class="view" id="view-ahora">
       <div class="section-head">
-        <div><p class="eyebrow">Actividad</p><h2>Últimas actividades</h2></div>
+        <div><h2>Últimas actividades</h2></div>
         <span class="hint" id="activityHint">—</span>
       </div>
       <div class="row" id="prefetchCard" style="margin-bottom:12px"></div>
@@ -609,7 +628,7 @@
     <!-- CACHE -->
     <section class="view" id="view-cache">
       <div class="section-head">
-        <div><p class="eyebrow">Memoria</p><h2>Caché de reproducción</h2></div>
+        <div><h2>Caché de reproducción</h2></div>
         <span class="hint" id="cacheHint">—</span>
       </div>
       <div class="toolbar">
@@ -626,8 +645,8 @@
     <!-- FUENTES -->
     <section class="view" id="view-fuentes">
       <div class="section-head">
-        <div><p class="eyebrow">Cascada</p><h2>Fuentes por tier</h2></div>
-        <span class="hint">se aplican al instante</span>
+        <div><h2>Fuentes por tier</h2></div>
+        
       </div>
 
       <div class="cascade" id="fuentesCascade">
@@ -742,9 +761,10 @@
                 <div class="bridge-head">
                   <div class="bridge-name">
                     <span class="pmark pmark-xuper">X</span>
-                    Xuper en vivo
+                    Xuper
                   </div>
                   <span class="pulse bad" id="xuperLiveBadge" title="Consultando"></span>
+                  <label class="switch" aria-label="Activar Xuper"><input type="checkbox" data-provider="xuper"><span></span></label>
                 </div>
                 <div class="xl-row">
                   <span class="xl-stat" title="Semillas en el plugin"><svg class="icon icon-sm"><use href="#i-database"></use></svg><b id="xlSemillas">—</b></span>
@@ -796,7 +816,7 @@
           </div>
 
           <div class="section-head small">
-            <div><p class="eyebrow">Puente</p><h2>Deno · video con IP atada</h2></div>
+            <div><h2>Deno · video con IP atada</h2></div>
             <button class="btn sm" id="btnBridgeTest"><svg class="icon icon-sm"><use href="#i-refresh"></use></svg> Probar</button>
           </div>
           <div class="bridge-grid" id="bridgeCards"></div>
@@ -807,17 +827,16 @@
     <!-- CAPA 0 -->
     <section class="view" id="view-propios">
       <div class="section-head">
-        <div><p class="eyebrow">Capa 0</p><h2>Contenido propio</h2></div>
+        <div><h2>Contenido propio</h2></div>
         <span class="hint" id="propiosMeta">—</span>
       </div>
-      <p class="hint" style="margin:0 2px 14px">Archivos alojados en Backblaze. Se sirven antes que cualquier proveedor, directo desde el bucket.</p>
-      <div class="list" id="propiosList"></div>
+            <div class="list" id="propiosList"></div>
       <div class="empty" id="propiosEmpty" hidden><strong>Sin contenido propio</strong>El catálogo está vacío o faltan credenciales de B2.</div>
     </section>
 
     <section class="view" id="view-ajustes">
       <div class="section-head">
-        <div><p class="eyebrow">Configuración</p><h2>Ajustes</h2></div>
+        <div><h2>Ajustes</h2></div>
         <span class="hint">sin reiniciar</span>
       </div>
       <form id="settingsForm">
@@ -1412,10 +1431,7 @@
     const b = d.bridge || {};
     const health = state.bridge || {};
     const denoOk = health.deno ? !!health.deno.ok : !!b.deno;
-    const dot = $('#heroBridgeDot');
-    const text = $('#heroBridgeText');
-    if (denoOk) { dot.className = 'dot ok'; text.textContent = 'Deno en línea · puente de video'; }
-    else { dot.className = 'dot bad'; text.textContent = 'Sin puente Deno'; }
+
     const qb = $('#quickBridge');
     if (qb) qb.textContent = denoOk ? 'Deno en línea' : 'sin puente Deno';
     const qa = $('#quickActivity');
@@ -1464,7 +1480,8 @@
     };
     el.innerHTML = items.map(([nombre, s]) => {
       const st = s ? (s.state || (s.ok ? 'ok' : '—')) : '—';
-      return '<span class="status-chip"><span class="dot ' + clase(s) + '"></span><b>' + esc(nombre) + '</b> ' + esc(st) + '</span>';
+      const mostrar = st && !['ok', 'healthy', 'activo'].includes(String(st).toLowerCase());
+      return '<span class="status-chip"><span class="dot ' + clase(s) + '"></span><b>' + esc(nombre) + '</b>' + (mostrar ? ' ' + esc(st) : '') + '</span>';
     }).join('');
   }
 
@@ -1934,14 +1951,14 @@
         '</article>';
     };
     const grupos = [
-      ['provGridT2', ['xuper', 'kawaii']],
+      ['provGridT2', ['kawaii']],
       ['provGridT3', ['gnula', 'fanpelis', 'web']]
     ];
     for (const [id, keys] of grupos) {
       const el = document.getElementById(id);
       if (el) el.innerHTML = keys.map((k) => fila(defs[k], k)).join('');
     }
-    for (const key of ['propios', 'yandex', 'xuperIdx']) {
+    for (const key of ['propios', 'yandex', 'xuperIdx', 'xuper']) {
       const sw = caja.querySelector('[data-provider="' + key + '"]');
       if (sw) sw.checked = prov[key] !== false;
     }
@@ -2385,7 +2402,8 @@
     const lista = p.lista || [];
     state.propios = lista;
     const meta = $('#propiosMeta');
-    if (meta) meta.textContent = (p.episodios || 0) + ' episodios · ' + (p.titulos || 0) + ' título(s) · ' + (p.bucket || 'sin bucket');
+    const nt = Number(p.titulos) || 0;
+    if (meta) meta.textContent = (p.episodios || 0) + ' episodios · ' + nt + (nt === 1 ? ' título' : ' títulos') + ' · ' + (p.bucket || 'sin bucket');
     const caja = $('#propiosList');
     if (!caja) return;
     const tipoNombre = { b2: 'B2', link: 'Link', torrent: 'Torrent', mixto: 'Mixto' };
@@ -2394,18 +2412,17 @@
     caja.innerHTML = lista.map((t) => {
       const pesoTexto = peso(t.pesoBytes);
       const extra = t.pesoDesconocido ? ' · ' + t.pesoDesconocido + ' sin peso' : '';
-      return '<div class="cache-card">' +
-        '<div class="cache-ico"><svg class="icon"><use href="#i-archive"></use></svg></div>' +
-        '<div style="min-width:0">' +
-        '<div class="cache-title">' + esc(t.title) + '</div>' +
-        '<div class="cache-meta"><span>' + esc(t.id) + '</span><span>·</span><span>' + t.episodios + ' eps</span>' +
-        (t.quality ? '<span>·</span><span>' + esc(t.quality) + '</span>' : '') +
-        (t.audio ? '<span>·</span><span>' + esc(t.audio) + '</span>' : '') +
+      const cantidad = t.type === 'series' ? (t.episodios || 0) + ' eps' : 'película';
+      return '<div class="row prov-row">' +
+        '<span class="row-ico"><svg class="icon icon-sm"><use href="#' + (t.type === 'series' ? 'i-series' : 'i-movie') + '"></use></svg></span>' +
+        '<div class="row-main">' +
+        '<div class="row-title">' + esc(t.title) + '</div>' +
+        '<div class="row-sub"><span>' + esc(t.id) + '</span><span>·</span><span>' + cantidad + '</span>' +
         '<span>·</span><span class="badge ' + (tipoClase[t.tipo] || 'm') + '">' + (tipoNombre[t.tipo] || t.tipo) + '</span>' +
-        '<span>·</span><span>' + pesoTexto + extra + '</span>' +
+        (t.pesoBytes ? '<span>·</span><span>' + pesoTexto + extra + '</span>' : '') +
         '</div></div>' +
         '<button class="btn sm" data-abrir-propios="' + esc(t.id) + '">Abrir</button>' +
-        '<button class="btn ghost sm danger" data-borrar-titulo="' + esc(t.id) + '" title="Eliminar todo el título"><svg class="icon icon-sm"><use href="#i-trash"></use></svg></button>' +
+        '<button class="btn ghost sm danger" data-borrar-titulo="' + esc(t.id) + '" title="Eliminar"><svg class="icon icon-sm"><use href="#i-trash"></use></svg></button>' +
         '</div>';
     }).join('');
 
@@ -2490,6 +2507,31 @@
   const VISTA_KEY = 'central_vista';
   const SCROLL_KEY = 'central_scroll';
 
+  let observerReveal = null;
+  function animarEntrada(vista) {
+    if (!window.IntersectionObserver) return;
+    try { if (matchMedia('(prefers-reduced-motion: reduce)').matches) return; } catch (_) {}
+    const cont = document.getElementById('view-' + vista);
+    if (!cont) return;
+    if (!observerReveal) {
+      observerReveal = new IntersectionObserver((entradas) => {
+        for (const e of entradas) {
+          if (!e.isIntersecting) continue;
+          e.target.classList.add('in');
+          observerReveal.unobserve(e.target);
+        }
+      }, { rootMargin: '0px 0px -6% 0px', threshold: 0.06 });
+    }
+    const sel = '.kpi, .row, .cache-card, .provider, .settings-card, .acc, .tier-card, .idx-card, .statusband';
+    const els = [...cont.querySelectorAll(sel)].filter((el) => !el.dataset.rv);
+    els.forEach((el, i) => {
+      el.dataset.rv = '1';
+      el.classList.add('reveal');
+      el.style.setProperty('--d', Math.min(i * 35, 210) + 'ms');
+      observerReveal.observe(el);
+    });
+  }
+
   function showView(id, opciones) {
     const restaurar = opciones && opciones.restaurar;
     const sinHistorial = opciones && (opciones.restaurar || opciones.sinHistorial);
@@ -2504,6 +2546,7 @@
     if (id === 'fuentes') { loadRefresh(); loadPropiosResumen(); }
     if (id === 'propios') loadPropios();
     if (state.data && (cambio || state.dirty[id])) renderView(id);
+    if (cambio && !restaurar) requestAnimationFrame(() => animarEntrada(id));
     if (!restaurar) {
       window.scrollTo({ top: 0, behavior: 'smooth' });
       try { localStorage.setItem(VISTA_KEY, id); localStorage.setItem(SCROLL_KEY, '0'); } catch (_) {}
