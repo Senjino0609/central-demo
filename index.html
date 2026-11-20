@@ -780,7 +780,7 @@
             <div class="tier-body">
               <div class="provider-grid" id="provGridT2"></div>
               <div class="settings-card" id="xuperLiveCard" style="margin-top:10px">
-                <div class="bridge-head">
+                <div class="bridge-head" data-detalle="xuper" style="cursor:pointer">
                   <div class="bridge-name">
                     <span class="pmark pmark-xuper">X</span>
                     Xuper
@@ -1172,7 +1172,7 @@
         error: '',
         nunca: false,
         pendienteB2: false,
-        proximo: '3:00–3:59 CO, cada 3 días',
+        proximo: '3:00–3:59 CO, cada noche',
         delta: { series: 2, episodios: 225, peliculas: 10, episodiosExistentes: 57, seriesActualizadas: 20 },
         indice: indice,
         historial: [
@@ -1690,8 +1690,8 @@
     const diaCO = new Date(ms - 5 * 3600 * 1000).toISOString().slice(0, 10);
     const base = Date.parse(diaCO + 'T08:00:00Z'); // 3:00 en Colombia
     if (!Number.isFinite(base)) return null;
-    let t = base + 3 * 86400000;
-    while (t < Date.now() - 6 * 3600000) t += 3 * 86400000;
+    let t = base + 86400000;
+    while (t < Date.now() - 6 * 3600000) t += 86400000;
     return t;
   }
 
@@ -1755,7 +1755,7 @@
         const t = proximaCorrida(r);
         ptxt.textContent = t ? fechaCorta(t) : '—';
         prox.classList.toggle('alerta', !!(t && t < Date.now()));
-        prox.title = 'Próxima automática (3–4 AM Colombia, cada 3 días)';
+        prox.title = 'Próxima automática (3–4 AM Colombia, cada noche)';
       }
     }
     if (ctl) ctl.classList.toggle('run', !!r.running);
@@ -2425,6 +2425,15 @@
   function renderEpisodiosPropios(t) {
     const body = $('#propiosSheetBody');
     if (!body) return;
+    const filtro = $('#propiosEpFilter');
+    const sinEpisodios = !Array.isArray(t.detalle) || !t.detalle.length;
+    if (filtro) filtro.hidden = sinEpisodios;
+    if (sinEpisodios) {
+      const tipo = t.tipo === 'torrent' ? 'torrent' : (t.tipo === 'link' ? 'enlace' : 'archivo');
+      body.innerHTML = '<div class="empty"><strong>Se reproduce completo</strong>Es una película (' + esc(tipo) + ')' +
+        (t.pesoBytes ? ' de ' + peso(t.pesoBytes) : '') + '. No tiene episodios que listar.</div>';
+      return;
+    }
     const q = String(($('#propiosEpFilter') && $('#propiosEpFilter').value) || '').trim().toLowerCase();
     const det = (t.detalle || []).filter((e) => {
       if (!q) return true;
