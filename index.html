@@ -247,6 +247,7 @@
   .st-node.bad span,.st-node.warn span{color:#ffd58a}
   .st-node.bad span{color:#ffb3c0}
   .st-link{flex:1 1 6px;height:1px;background:rgba(255,255,255,.10);margin-top:3.5px;min-width:6px}
+  .statusband.apagado .st-chain{opacity:.3;filter:grayscale(1);transition:opacity .3s var(--ease-out)}
   .kpi-grid.compact{margin-top:10px;gap:7px;grid-template-columns:repeat(4,minmax(0,1fr))}
   .kpi-grid.compact .kpi{padding:9px 9px 10px;border-radius:14px;overflow:hidden}
   .kpi-grid.compact .kpi-value{font-size:17px}
@@ -911,6 +912,8 @@
 
       <div class="danger-zone">
         <h3>Zona peligrosa</h3>
+        <button class="btn danger sm" id="btnApagarAddon">Apagar el addon</button>
+        <p class="hint" id="addonEstado" style="margin:6px 2px 0"></p>
         <button class="btn danger sm" id="btnClearCache"><svg class="icon icon-sm"><use href="#i-trash"></use></svg> Vaciar toda la caché</button>
         <button class="btn danger sm" id="btnClearActivity"><svg class="icon icon-sm"><use href="#i-trash"></use></svg> Borrar historial</button>
         <button class="btn ghost sm" id="btnLogout">Salir</button>
@@ -1235,7 +1238,10 @@
       try { Object.assign(DEMO.state.providers, JSON.parse(opts.body || '{}').providers || {}); } catch (_) {}
       return { ok: true, providers: DEMO.state.providers };
     }
-    if (p === '/api/dash/settings') return { ok: true, settings: DEMO.state.settings };
+    if (p === '/api/dash/settings') {
+      try { Object.assign(DEMO.state.settings, JSON.parse(opts.body || '{}')); } catch (_) {}
+      return { ok: true, settings: DEMO.state.settings };
+    }
     if (p === '/api/dash/refresh') {
       if (DEMO.refresh.running) return { ok: true };
       DEMO.refresh.running = true;
@@ -1483,20 +1489,23 @@
     };
     const nodos = items.map(([nombre, s]) => ({ nombre, s, c: clase(s) }));
     const problemas = nodos.filter((n) => n.c === 'warn' || n.c === 'bad');
-    let frase = 'Todo en orden';
+    const apagado = !!(state.data.settings && state.data.settings.addonApagado);
+    let frase = apagado ? 'Addon apagado' : 'Todo en orden';
     if (problemas.length === 1) {
       const p = problemas[0];
       frase = p.nombre + (p.c === 'bad' ? ' caído' : ' inestable');
     } else if (problemas.length > 1) {
       frase = problemas.length + ' servicios con problemas';
     }
-    const general = problemas.some((p) => p.c === 'bad') ? 'bad' : (problemas.length ? 'warn' : 'ok');
+    const general = apagado ? 'bad' : (problemas.some((p) => p.c === 'bad') ? 'bad' : (problemas.length ? 'warn' : 'ok'));
     const texto = (n) => {
       const s = n.s;
       if (!s) return 'sin datos';
       if (n.c === 'ok') return 'en línea';
       return String(s.state || 'con problemas');
     };
+    const banda = el.closest('.statusband');
+    if (banda) banda.classList.toggle('apagado', apagado);
     el.innerHTML =
       '<div class="st-head ' + general + '"><span>' + esc(frase) + '</span></div>' +
       '<div class="st-chain">' + nodos.map((n, i) =>
@@ -2281,6 +2290,16 @@
     chk('setUnknown', s.keepUnknown);
     chk('setXuper', s.xuperDirecto);
     chk('setXuperShared', s.xuperCuentaCompartida);
+
+    const apagado = s.addonApagado === true;
+    const ba = $('#btnApagarAddon');
+    if (ba) {
+      ba.textContent = apagado ? 'Encender el addon' : 'Apagar el addon';
+      ba.classList.toggle('primary', apagado);
+      ba.classList.toggle('danger', !apagado);
+    }
+    const ae = $('#addonEstado');
+    if (ae) ae.textContent = apagado ? 'Apagado: Nuvio no recibe listas ni fuentes.' : '';
   }
 
   async function saveSettings(e) {
@@ -2806,6 +2825,26 @@
         const r = await api('/api/dash/settings', { method: 'POST', body: JSON.stringify({ reset: true }) });
         if (r.ok) { state.settingsDirty = false; toast('Ajustes restablecidos'); await loadState(true); }
         else toast(r.error || 'No se pudo', 'error');
+      } catch (e) { toast(e.message, 'error'); }
+    });
+  });
+
+  $('#btnApagarAddon').addEventListener('click', () => {
+    const apagado = !!(state.data && state.data.settings && state.data.settings.addonApagado);
+    const titulo = apagado ? 'Encender el addon' : 'Apagar el addon';
+    const cuerpo = apagado
+      ? '<p class="muted" style="font-size:12px;line-height:1.6">Nuvio volverá a recibir listas y fuentes normalmente.</p>'
+      : '<p class="muted" style="font-size:12px;line-height:1.6">Nuvio no recibirá listas, fichas ni fuentes. El tablero sigue funcionando para volver a encenderlo.</p>';
+    openModal(titulo, cuerpo + '<div class="modal-actions"><button class="btn" data-close>Cancelar</button><button class="btn ' + (apagado ? 'primary' : 'danger') + '" id="confirmApagar">' + (apagado ? 'Encender' : 'Apagar') + '</button></div>');
+    $('#confirmApagar').addEventListener('click', async () => {
+      closeModal();
+      try {
+        const r = await api('/api/dash/settings', { method: 'POST', body: JSON.stringify({ addonApagado: !apagado }) });
+        if (r.ok) {
+          state.settingsDirty = false;
+          toast(apagado ? 'Addon encendido' : 'Addon apagado');
+          await loadState(true);
+        } else toast(r.error || 'No se pudo', 'error');
       } catch (e) { toast(e.message, 'error'); }
     });
   });
