@@ -341,9 +341,10 @@
   .xl-tag.warn{color:#ffd58a;background:rgba(240,164,94,.12);border-color:rgba(240,164,94,.3)}
   .xl-tag.bad{color:#ffb3c0;background:rgba(255,77,109,.10);border-color:rgba(255,77,109,.28)}
   .prov-row{padding:10px 11px;gap:9px}
-  .prov-row .row-title{white-space:normal;line-height:1.25}
-  .prov-row .btn{padding:7px 9px;font-size:11px;flex:0 0 auto}
-  .prov-row .btn.danger{width:32px;padding:0;height:32px;justify-content:center}
+  .prov-row .row-title{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;line-height:1.25}
+  .prov-row .btn{padding:6px 9px;font-size:10.5px;flex:0 0 auto}
+  .prov-row .btn.danger{width:30px;padding:0;height:30px;justify-content:center}
+  .prov-row .row-sub{gap:5px}
 
   /* ---------- movimiento ---------- */
   :root{--ease-out:cubic-bezier(.23,1,.32,1)}
@@ -828,7 +829,6 @@
     <section class="view" id="view-propios">
       <div class="section-head">
         <div><h2>Contenido propio</h2></div>
-        <span class="hint" id="propiosMeta">—</span>
       </div>
             <div class="list" id="propiosList"></div>
       <div class="empty" id="propiosEmpty" hidden><strong>Sin contenido propio</strong>El catálogo está vacío o faltan credenciales de B2.</div>
@@ -2401,9 +2401,6 @@
   function renderPropios(p) {
     const lista = p.lista || [];
     state.propios = lista;
-    const meta = $('#propiosMeta');
-    const nt = Number(p.titulos) || 0;
-    if (meta) meta.textContent = (p.episodios || 0) + ' episodios · ' + nt + (nt === 1 ? ' título' : ' títulos') + ' · ' + (p.bucket || 'sin bucket');
     const caja = $('#propiosList');
     if (!caja) return;
     const tipoNombre = { b2: 'B2', link: 'Link', torrent: 'Torrent', mixto: 'Mixto' };
@@ -2417,7 +2414,7 @@
         '<span class="row-ico"><svg class="icon icon-sm"><use href="#' + (t.type === 'series' ? 'i-series' : 'i-movie') + '"></use></svg></span>' +
         '<div class="row-main">' +
         '<div class="row-title">' + esc(t.title) + '</div>' +
-        '<div class="row-sub"><span>' + esc(t.id) + '</span><span>·</span><span>' + cantidad + '</span>' +
+        '<div class="row-sub"><span>' + cantidad + '</span>' +
         '<span>·</span><span class="badge ' + (tipoClase[t.tipo] || 'm') + '">' + (tipoNombre[t.tipo] || t.tipo) + '</span>' +
         (t.pesoBytes ? '<span>·</span><span>' + pesoTexto + extra + '</span>' : '') +
         '</div></div>' +
