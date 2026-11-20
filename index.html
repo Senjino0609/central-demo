@@ -229,9 +229,19 @@
   .statusband-brand strong{display:block;font-size:14px;line-height:1.1}
   .statusband-brand span{display:block;font-size:10.5px;color:var(--muted);margin-top:2px}
   .statusband .hero-pill{margin:0;padding:6px 10px;font-size:10.5px}
-  .status-strip{position:relative;z-index:1;display:flex;flex-wrap:wrap;gap:5px;margin-top:10px}
-  .status-chip{display:inline-flex;align-items:center;gap:6px;flex:0 0 auto;padding:6px 9px;border-radius:999px;border:1px solid var(--line);background:rgba(12,10,9,.75);font-size:10px;color:var(--muted);white-space:nowrap}
-  .status-chip b{font-weight:700;color:var(--text);font-size:10.5px}
+  .status-strip{position:relative;z-index:1;margin-top:10px}
+  .st-head{display:flex;align-items:center;gap:7px;font-size:12px;font-weight:650;color:var(--text)}
+  .st-head .pulse{width:8px;height:8px}
+  .st-chain{display:flex;align-items:flex-start;margin-top:11px}
+  .st-node{display:flex;flex-direction:column;align-items:center;gap:4px;flex:1;min-width:0;font-size:8.5px;color:var(--muted-2)}
+  .st-node b{width:8px;height:8px;border-radius:50%;background:var(--green);flex:0 0 auto;box-shadow:0 0 0 3px rgba(134,192,143,.10)}
+  .st-node.warn b{background:var(--amber);box-shadow:0 0 0 3px rgba(240,164,94,.10)}
+  .st-node.bad b{background:var(--red);box-shadow:0 0 0 3px rgba(226,101,92,.10)}
+  .st-node.off b{background:var(--muted-2);box-shadow:none}
+  .st-node span{max-width:100%;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .st-node.bad span,.st-node.warn span{color:#ffd58a}
+  .st-node.bad span{color:#ffb3c0}
+  .st-link{flex:1;height:1px;background:rgba(255,255,255,.10);margin-top:3.5px}
   .kpi-grid.compact{margin-top:10px;gap:7px;grid-template-columns:repeat(4,minmax(0,1fr))}
   .kpi-grid.compact .kpi{padding:9px 9px 10px;border-radius:14px;overflow:hidden}
   .kpi-grid.compact .kpi-value{font-size:17px}
@@ -1466,23 +1476,40 @@
     const items = [
       ['Yandex', src.yandex],
       ['Xuper', src.xuper],
-      ['Xuper Idx', src.xuperIdx],
+      ['X. Idx', src.xuperIdx],
       ['Caché', src.cache],
       ['Puente', puente]
     ];
     const clase = (s) => {
-      if (!s) return '';
-      if (s.ok) return 'ok';
+      if (!s) return 'off';
       const st = String(s.state || '').toLowerCase();
-      if (st === 'off' || st === 'apagado') return '';
+      if (s.ok) return 'ok';
+      if (st === 'off' || st === 'apagado') return 'off';
       if (st === 'degraded' || st === 'cargando' || st === 'parcial' || s.warn) return 'warn';
       return 'bad';
     };
-    el.innerHTML = items.map(([nombre, s]) => {
-      const st = s ? (s.state || (s.ok ? 'ok' : '—')) : '—';
-      const mostrar = st && !['ok', 'healthy', 'activo'].includes(String(st).toLowerCase());
-      return '<span class="status-chip"><span class="dot ' + clase(s) + '"></span><b>' + esc(nombre) + '</b>' + (mostrar ? ' ' + esc(st) : '') + '</span>';
-    }).join('');
+    const nodos = items.map(([nombre, s]) => ({ nombre, s, c: clase(s) }));
+    const problemas = nodos.filter((n) => n.c === 'warn' || n.c === 'bad');
+    let frase = 'Todo en orden';
+    if (problemas.length === 1) {
+      const p = problemas[0];
+      frase = p.nombre + (p.c === 'bad' ? ' caído' : ' inestable');
+    } else if (problemas.length > 1) {
+      frase = problemas.length + ' servicios con problemas';
+    }
+    const general = problemas.some((p) => p.c === 'bad') ? 'bad' : (problemas.length ? 'warn' : 'ok');
+    const texto = (n) => {
+      const s = n.s;
+      if (!s) return 'sin datos';
+      if (n.c === 'ok') return 'en línea';
+      return String(s.state || 'con problemas');
+    };
+    el.innerHTML =
+      '<div class="st-head"><span class="pulse ' + general + '"></span><span>' + esc(frase) + '</span></div>' +
+      '<div class="st-chain">' + nodos.map((n, i) =>
+        (i ? '<i class="st-link"></i>' : '') +
+        '<span class="st-node ' + n.c + '" title="' + attr(n.nombre + ': ' + texto(n)) + '"><b></b><span>' + esc(n.nombre) + '</span></span>'
+      ).join('') + '</div>';
   }
 
   function renderHomeActivity() {
