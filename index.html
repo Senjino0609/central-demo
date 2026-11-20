@@ -233,7 +233,7 @@
   .st-head{display:flex;align-items:center;gap:7px;font-size:12px;font-weight:650;color:var(--text)}
   .st-head .pulse{width:8px;height:8px}
   .st-chain{display:flex;align-items:flex-start;margin-top:11px}
-  .st-node{display:flex;flex-direction:column;align-items:center;gap:4px;flex:1;min-width:0;font-size:8.5px;color:var(--muted-2)}
+  .st-node{display:flex;flex-direction:column;align-items:center;gap:4px;flex:0 0 auto;min-width:0;padding:0 2px;font-size:8.5px;color:var(--muted-2)}
   .st-node b{width:8px;height:8px;border-radius:50%;background:var(--green);flex:0 0 auto;box-shadow:0 0 0 3px rgba(134,192,143,.10)}
   .st-node.warn b{background:var(--amber);box-shadow:0 0 0 3px rgba(240,164,94,.10)}
   .st-node.bad b{background:var(--red);box-shadow:0 0 0 3px rgba(226,101,92,.10)}
@@ -241,7 +241,7 @@
   .st-node span{max-width:100%;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
   .st-node.bad span,.st-node.warn span{color:#ffd58a}
   .st-node.bad span{color:#ffb3c0}
-  .st-link{flex:1;height:1px;background:rgba(255,255,255,.10);margin-top:3.5px}
+  .st-link{flex:1 1 6px;height:1px;background:rgba(255,255,255,.10);margin-top:3.5px;min-width:6px}
   .kpi-grid.compact{margin-top:10px;gap:7px;grid-template-columns:repeat(4,minmax(0,1fr))}
   .kpi-grid.compact .kpi{padding:9px 9px 10px;border-radius:14px;overflow:hidden}
   .kpi-grid.compact .kpi-value{font-size:17px}
@@ -1473,10 +1473,12 @@
     const h = state.bridge || {};
     const denoOk = h.deno ? !!h.deno.ok : !!b.deno;
     const puente = { ok: denoOk, state: denoOk ? 'ok' : 'off' };
+    // Mismo orden que los tiers: T1 (Yandex, X. Idx), T2 (Xuper) y al final lo técnico.
+    // Propios no va: es el T0 y siempre está arriba.
     const items = [
       ['Yandex', src.yandex],
-      ['Xuper', src.xuper],
       ['X. Idx', src.xuperIdx],
+      ['Xuper', src.xuper],
       ['Caché', src.cache],
       ['Puente', puente]
     ];
