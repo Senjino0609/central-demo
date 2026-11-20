@@ -312,6 +312,34 @@
   .refresh-ctl.run .refresh-spin .icon{width:16px;height:16px}
   .idx-changes.flash .chg,.idx-changes.flash .ok{animation:chipIn .45s ease both}
   @keyframes chipIn{from{opacity:0;transform:translateY(-5px) scale(.85)}to{opacity:1;transform:none}}
+  .pmark{width:30px;height:30px;border-radius:9px;display:grid;place-items:center;flex:0 0 auto;font-size:13px;font-weight:800;letter-spacing:-.02em;border:1px solid rgba(255,255,255,.10);background:rgba(255,255,255,.05)}
+  .pmark .icon{width:17px;height:17px}
+  .pmark-yandex{color:#ff5a3c;background:rgba(252,63,29,.12);border-color:rgba(252,63,29,.28)}
+  .pmark-xuper{color:#5cabff;background:#0c1327;border-color:rgba(92,171,255,.30)}
+  .pmark-kawaii{color:#ffa7c4;background:rgba(255,122,168,.12);border-color:rgba(255,122,168,.26)}
+  .pmark-gnula{color:#8fe3d5;background:rgba(55,194,168,.12);border-color:rgba(55,194,168,.26)}
+  .pmark-fanpelis{color:#ffd08a;background:rgba(242,160,61,.12);border-color:rgba(242,160,61,.26)}
+  .pmark-propios{color:var(--cyan);background:rgba(232,132,90,.12);border-color:rgba(232,132,90,.26)}
+  .pmark-web{color:#b9c6d8;background:rgba(143,168,201,.12);border-color:rgba(143,168,201,.26)}
+  .pulse{width:9px;height:9px;border-radius:50%;background:var(--green);position:relative;flex:0 0 auto;color:var(--green)}
+  .pulse::after{content:"";position:absolute;inset:-3px;border-radius:50%;border:1px solid currentColor;opacity:0;animation:latido 1.9s ease-out infinite}
+  .pulse.warn{background:var(--amber);color:var(--amber)}
+  .pulse.bad{background:var(--red);color:var(--red)}
+  .pulse.off{background:var(--muted-2);color:var(--muted-2)}
+  @keyframes latido{0%{transform:scale(.7);opacity:.75}70%{transform:scale(1.9);opacity:0}100%{opacity:0}}
+  .xl-row{display:flex;align-items:center;gap:8px;margin-top:9px;flex-wrap:wrap}
+  .xl-stat{display:inline-flex;align-items:center;gap:5px;padding:5px 8px;border-radius:9px;background:rgba(255,255,255,.03);font-size:10px;color:var(--muted)}
+  .xl-stat .icon{width:13px;height:13px;color:var(--cyan)}
+  .xl-stat b{color:var(--text);font-size:11.5px;font-variant-numeric:tabular-nums}
+  .xl-row .btn{margin-left:auto;padding:7px 9px;font-size:11px}
+  .xl-row .btn .icon{transition:transform .3s}
+  .xl-row .btn.run .icon{animation:girar .9s linear infinite}
+  .xl-result{margin-top:8px}
+  .xl-tag{display:inline-flex;align-items:center;gap:5px;padding:4px 8px;border-radius:999px;font-size:10.5px;font-weight:700;border:1px solid transparent;animation:chipIn .35s ease both}
+  .xl-tag .icon{width:13px;height:13px}
+  .xl-tag.ok{color:#b9dcbf;background:rgba(134,192,143,.12);border-color:rgba(134,192,143,.3)}
+  .xl-tag.warn{color:#ffd58a;background:rgba(240,164,94,.12);border-color:rgba(240,164,94,.3)}
+  .xl-tag.bad{color:#ffb3c0;background:rgba(255,77,109,.10);border-color:rgba(255,77,109,.28)}
   .idx-head{display:flex;align-items:center;gap:8px}
   .idx-head strong{font-size:12.5px;flex:1;min-width:0}
   .idx-head .switch{width:42px;height:24px}
@@ -469,6 +497,7 @@
   <symbol id="i-bridge" viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="12" rx="2" fill="none" stroke="currentColor" stroke-width="1.7"/><path d="M8 21h8M12 17v4" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/><path d="M7 10h3M14 10h3M7 13h10" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></symbol>
   <symbol id="i-trash" viewBox="0 0 24 24"><path d="M4 7h16M9 7V4h6v3M7 7l1 13h8l1-13" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/><path d="M10 11v5M14 11v5" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></symbol>
   <symbol id="i-clock" viewBox="0 0 24 24"><circle cx="12" cy="12" r="8.5" fill="none" stroke="currentColor" stroke-width="1.7"/><path d="M12 7.5V12l3 2" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+  <symbol id="i-yandex" viewBox="0 0 24 24"><path fill="currentColor" fill-rule="evenodd" d="M16.376 12.644 21 2h-3.842l-4.624 10.644zM13.915 24v-3.733c0-2.822-.352-3.64-1.407-5.988L6.933 2H3l7.124 15.709V24h3.79z"/></symbol>
   <symbol id="i-calendar" viewBox="0 0 24 24"><rect x="3.5" y="5" width="17" height="15" rx="2.5" fill="none" stroke="currentColor" stroke-width="1.7"/><path d="M3.5 9h17M8 3.5V6M16 3.5V6" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/></symbol>
   <symbol id="i-pulse" viewBox="0 0 24 24"><path d="M3 12h3.2l2.4 6L12 5l3.2 7H21" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></symbol>
   <symbol id="i-database" viewBox="0 0 24 24"><ellipse cx="12" cy="5.5" rx="7.5" ry="3" fill="none" stroke="currentColor" stroke-width="1.7"/><path d="M4.5 5.5v13c0 1.7 3.4 3 7.5 3s7.5-1.3 7.5-3v-13" fill="none" stroke="currentColor" stroke-width="1.7"/><path d="M4.5 12c0 1.7 3.4 3 7.5 3s7.5-1.3 7.5-3" fill="none" stroke="currentColor" stroke-width="1.7"/></symbol>
@@ -646,9 +675,9 @@
               <div class="idx-cards">
                 <article class="idx-card">
                   <div class="idx-head">
-                    <span class="provider-ico v" style="width:30px;height:30px"><svg class="icon icon-sm"><use href="#i-layers"></use></svg></span>
+                    <span class="pmark pmark-yandex"><svg class="icon"><use href="#i-yandex"></use></svg></span>
                     <strong>Yandex</strong>
-                    <span class="badge g" id="yandexBadge">—</span>
+                    <span class="pulse ok" id="yandexBadge" title="En línea"></span>
                     <label class="switch" aria-label="Activar Yandex"><input type="checkbox" data-provider="yandex"><span></span></label>
                   </div>
                   <div class="stats">
@@ -684,9 +713,9 @@
 
                 <article class="idx-card">
                   <div class="idx-head">
-                    <span class="provider-ico c" style="width:30px;height:30px"><svg class="icon icon-sm"><use href="#i-database"></use></svg></span>
+                    <span class="pmark pmark-xuper">X</span>
                     <strong>Xuper</strong>
-                    <span class="badge g" id="xuperIdxBadge">—</span>
+                    <span class="pulse ok" id="xuperIdxBadge" title="En línea"></span>
                     <label class="switch" aria-label="Activar Xuper Idx"><input type="checkbox" data-provider="xuperIdx"><span></span></label>
                   </div>
                   <div class="stats">
@@ -712,13 +741,17 @@
               <div class="settings-card" id="xuperLiveCard" style="margin-top:10px">
                 <div class="bridge-head">
                   <div class="bridge-name">
-                    <span class="provider-ico c" style="width:32px;height:32px"><svg class="icon icon-sm"><use href="#i-pulse"></use></svg></span>
+                    <span class="pmark pmark-xuper">X</span>
                     Xuper en vivo
                   </div>
-                  <span class="badge r" id="xuperLiveBadge">—</span>
+                  <span class="pulse bad" id="xuperLiveBadge" title="Consultando"></span>
                 </div>
-                <div class="chips" id="xuperLiveChips" style="margin-top:8px"></div>
-                <p class="hint" id="xuperLiveDetail" style="margin:8px 0 0">Consultando…</p>
+                <div class="xl-row">
+                  <span class="xl-stat" title="Semillas en el plugin"><svg class="icon icon-sm"><use href="#i-database"></use></svg><b id="xlSemillas">—</b></span>
+                  <span class="xl-stat" title="Pausa del vigilante"><svg class="icon icon-sm"><use href="#i-clock"></use></svg><b id="xlPausa">—</b></span>
+                  <button class="btn sm" id="btnProbarSemillas"><svg class="icon icon-sm"><use href="#i-refresh"></use></svg> Probar semillas</button>
+                </div>
+                <div class="xl-result" id="xlResultado"></div>
               </div>
             </div>
           </div>
@@ -1229,6 +1262,23 @@
     if (p.startsWith('/api/dash/cache/')) return { ok: true, ttlDias: 5 };
     if (p === '/api/dash/action') return { ok: true };
     if (p === '/api/dash/tier2') return { ok: true };
+    if (p === '/api/dash/xuper/semillas') {
+      await new Promise((r) => setTimeout(r, 1700));
+      const dado = Math.random();
+      if (dado < 0.7) {
+        DEMO.state.tier2.xuper = Object.assign({}, DEMO.state.tier2.xuper, { salud: 'healthy', error: '', semillas: demoRnd(120, 200), pausaHasta: 0 });
+        DEMO.state.sources.xuper = { ok: true, warn: false, state: 'healthy', detail: '1 proxies · semillas vivas' };
+        return { ok: true, estado: 'funciona', semillas: DEMO.state.tier2.xuper.semillas, rotado: true };
+      }
+      if (dado < 0.85) {
+        DEMO.state.tier2.xuper = Object.assign({}, DEMO.state.tier2.xuper, { salud: 'degraded', error: 'sin semillas', semillas: 0, pausaHasta: 0 });
+        DEMO.state.sources.xuper = { ok: false, warn: true, state: 'degraded', detail: 'sin semillas' };
+        return { ok: false, estado: 'sin_semillas', semillas: 0, rotado: false };
+      }
+      DEMO.state.tier2.xuper = Object.assign({}, DEMO.state.tier2.xuper, { salud: 'degraded', error: 'Xuper no está disponible ahora', semillas: demoRnd(60, 180), pausaHasta: Date.now() + 3600000 });
+      DEMO.state.sources.xuper = { ok: false, warn: true, state: 'degraded', detail: 'semillas sin servicio' };
+      return { ok: false, estado: 'no_sirven', semillas: DEMO.state.tier2.xuper.semillas, rotado: true };
+    }
     return { ok: true };
   }
 
@@ -1267,6 +1317,17 @@
   function providerName(key) {
     return ({ propios: 'Propios', yandex: 'Yandex', xuper: 'Xuper', xuperIdx: 'Xuper Idx', gnula: 'Gnula', kawaii: 'Kawaii', web: 'Scrapers web' })[key] || cap(key);
   }
+  function brandMark(key) {
+    if (key === 'yandex') return '<span class="pmark pmark-yandex"><svg class="icon"><use href="#i-yandex"></use></svg></span>';
+    if (key === 'propios') return '<span class="pmark pmark-propios"><svg class="icon"><use href="#i-archive"></use></svg></span>';
+    if (key === 'web') return '<span class="pmark pmark-web"><svg class="icon"><use href="#i-globe"></use></svg></span>';
+    if (key === 'xuper' || key === 'xuperIdx') return '<span class="pmark pmark-xuper">X</span>';
+    if (key === 'kawaii') return '<span class="pmark pmark-kawaii">K</span>';
+    if (key === 'gnula') return '<span class="pmark pmark-gnula">G</span>';
+    if (key === 'fanpelis') return '<span class="pmark pmark-fanpelis">F</span>';
+    return '<span class="pmark">•</span>';
+  }
+
   function providerClass(key) {
     return ({ propios: 'p', yandex: 'v', xuper: 'c', xuperIdx: 'c', gnula: 'g', kawaii: 'p', web: 'a' })[key] || 'v';
   }
@@ -1486,30 +1547,15 @@
     const d = state.data || {};
     const x = (d.tier2 && d.tier2.xuper) || {};
     const badge = $('#xuperLiveBadge');
-    const chips = $('#xuperLiveChips');
-    const det = $('#xuperLiveDetail');
-    if (!badge || !chips || !det) return;
+    if (!badge) return;
     const st = String(x.salud || 'desconocido');
-    const sano = st === 'healthy';
-    badge.textContent = sano ? 'sano' : (st === 'degraded' ? 'degradado' : st);
-    badge.className = 'badge ' + (sano ? 'g' : (st === 'desconocido' ? 'm' : 'r'));
-
+    const clase = st === 'healthy' ? 'ok' : (st === 'degraded' || st === 'recovering' ? 'warn' : 'bad');
+    badge.className = 'pulse ' + clase;
+    badge.title = st;
+    const set = (id, v) => { const el = $('#' + id); if (el) el.textContent = v; };
+    set('xlSemillas', String(x.semillas || 0));
     const resta = Number(x.pausaHasta || 0) > Date.now() ? Number(x.pausaHasta) - Date.now() : 0;
-    const horas = resta ? Math.ceil(resta / 3600000) : 0;
-    chips.innerHTML = [
-      '<span class="badge ' + (sano ? 'g' : 'r') + '">' + esc(st) + '</span>',
-      resta > 0 ? '<span class="badge w">pausa ' + horas + ' h</span>' : '',
-      '<span class="badge m">' + esc(x.semillas || 0) + ' semillas</span>',
-      '<span class="badge m">' + esc(x.fallos || 0) + (Number(x.fallos) === 1 ? ' fallo' : ' fallos') + '</span>',
-      '<span class="badge m">' + esc(x.curas || 0) + (Number(x.curas) === 1 ? ' cura' : ' curas') + '</span>'
-    ].filter(Boolean).join('');
-
-    const partes = [];
-    if (x.ultimaPrueba) partes.push('última prueba ' + timeAgo(Number(x.ultimaPrueba)) + (x.ultimaPruebaOk ? ' (bien)' : ' (falló)'));
-    if (x.error) partes.push('motivo: ' + x.error);
-    if (resta > 0) partes.push('reintenta en ' + horas + ' h');
-    partes.push('las filas de Xuper Idx salen del índice propio y no dependen de esto');
-    det.textContent = partes.join(' · ');
+    set('xlPausa', resta ? Math.ceil(resta / 3600000) + ' h' : '—');
   }
 
   function renderXuperIdx() {
@@ -1519,8 +1565,8 @@
     if (!badge) return;
     const listo = !!(ix.cargado && Number(ix.series) > 0);
     const conArchivos = Number(ix.series) > 0;
-    badge.textContent = listo ? 'en línea' : (conArchivos ? 'cargando' : 'sin cargar');
-    badge.className = 'badge ' + (listo ? 'g' : (conArchivos ? 'w' : 'r'));
+    badge.className = 'pulse ' + (listo ? 'ok' : (conArchivos ? 'warn' : 'bad'));
+    badge.title = listo ? 'En línea' : (conArchivos ? 'Cargando' : 'Sin cargar');
     const set = (id, v) => { const el = $('#' + id); if (el) el.textContent = v; };
     set('xSeries', fmt(ix.series));
     set('xEps', fmt(ix.episodios));
@@ -1634,8 +1680,8 @@
     const yb = $('#yandexBadge');
     if (yb) {
       const sano = !!(ix.cargado && Number(ix.series) > 0);
-      yb.textContent = sano ? 'en línea' : 'sin índice';
-      yb.className = 'badge ' + (sano ? 'g' : 'r');
+      yb.className = 'pulse ' + (sano ? 'ok' : 'bad');
+      yb.title = sano ? 'En línea' : 'Sin índice';
     }
 
     // Última corrida: solo el tiempo, con icono.
@@ -1882,7 +1928,7 @@
       const on = !forzadoOff && prov[key] !== false;
       const detalle = (key === 'xuper' || key === 'gnula') ? ' data-detalle="' + key + '"' : '';
       return '<article class="provider" style="cursor:' + (detalle ? 'pointer' : 'default') + '"' + detalle + '>' +
-        '<div class="provider-ico ' + providerClass(key) + '"><svg class="icon"><use href="#' + p.icon + '"></use></svg></div>' +
+        brandMark(key) +
         '<div class="provider-main"><strong>' + esc(p.name) + '</strong><span>' + esc(p.desc) + '</span></div>' +
         '<label class="switch" aria-label="Activar ' + attr(p.name) + '"><input type="checkbox" data-provider="' + key + '"' + (on ? ' checked' : '') + (forzadoOff ? ' disabled aria-disabled="true"' : '') + '><span></span></label>' +
         '</article>';
@@ -2601,6 +2647,30 @@
       if (!t) cerrarPropios();
       else { state.propiosAbierto = t; renderEpisodiosPropios(t); }
     }
+  });
+
+  $('#btnProbarSemillas').addEventListener('click', async () => {
+    const btn = $('#btnProbarSemillas');
+    const res = $('#xlResultado');
+    if (!btn || btn.disabled) return;
+    btn.disabled = true;
+    btn.classList.add('run');
+    res.innerHTML = '';
+    try {
+      const r = await api('/api/dash/xuper/semillas', { method: 'POST', body: '{}' });
+      const mapa = {
+        funciona: ['ok', 'Funciona', 'i-check'],
+        sin_semillas: ['warn', 'Sin semillas', 'i-database'],
+        no_sirven: ['bad', 'No sirven', 'i-x']
+      };
+      const m = mapa[r.estado] || ['bad', 'No sirven', 'i-x'];
+      res.innerHTML = '<span class="xl-tag ' + m[0] + '"><svg class="icon"><use href="#' + m[2] + '"></use></svg>' + m[1] + '</span>';
+      await loadState(true);
+    } catch (e) {
+      res.innerHTML = '<span class="xl-tag bad"><svg class="icon"><use href="#i-x"></use></svg>Error</span>';
+    }
+    btn.disabled = false;
+    btn.classList.remove('run');
   });
 
   $('#closePropiosSheet').addEventListener('click', cerrarPropios);
