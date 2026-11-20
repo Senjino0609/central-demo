@@ -350,6 +350,10 @@
   .xl-row .btn .icon{transition:transform .3s}
   .xl-row .btn.run .icon{animation:girar .9s linear infinite}
   .xl-result{margin-top:8px}
+  .xl-stat{cursor:pointer}
+  .xl-stat:active{transform:scale(.97)}
+  .xl-stat b{text-decoration:underline dotted rgba(255,255,255,.22);text-underline-offset:3px}
+  .xl-note{margin-top:8px;padding:7px 9px;border-radius:9px;background:rgba(255,255,255,.03);border:1px solid var(--line);font-size:10.5px;line-height:1.45;color:var(--muted);animation:chipIn .25s ease both}
   .xl-tag{display:inline-flex;align-items:center;gap:5px;padding:4px 8px;border-radius:999px;font-size:10.5px;font-weight:700;border:1px solid transparent;animation:chipIn .35s ease both}
   .xl-tag .icon{width:13px;height:13px}
   .xl-tag.ok{color:#b9dcbf;background:rgba(134,192,143,.12);border-color:rgba(134,192,143,.3)}
@@ -780,10 +784,11 @@
                   <label class="switch" aria-label="Activar Xuper"><input type="checkbox" data-provider="xuper"><span></span></label>
                 </div>
                 <div class="xl-row">
-                  <span class="xl-stat" title="Semillas en el plugin"><svg class="icon icon-sm"><use href="#i-database"></use></svg><b id="xlSemillas">—</b></span>
-                  <span class="xl-stat" title="Pausa del vigilante"><svg class="icon icon-sm"><use href="#i-clock"></use></svg><b id="xlPausa">—</b></span>
+                  <span class="xl-stat" role="button" tabindex="0" title="Semillas en el plugin" data-info="Semillas: cuentas activas que el plugin usa para entrar a Xuper. Si llegan a 0, Xuper deja de responder."><svg class="icon icon-sm"><use href="#i-database"></use></svg><b id="xlSemillas">—</b></span>
+                  <span class="xl-stat" role="button" tabindex="0" title="Pausa del vigilante" data-info="Pausa: tiempo que falta para que el vigilante vuelva a probar Xuper. Mientras dura, no se hacen intentos."><svg class="icon icon-sm"><use href="#i-clock"></use></svg><b id="xlPausa">—</b></span>
                   <button class="btn sm" id="btnProbarSemillas"><svg class="icon icon-sm"><use href="#i-refresh"></use></svg> Probar semillas</button>
                 </div>
+                <div class="xl-note" id="xlNota" hidden></div>
                 <div class="xl-result" id="xlResultado"></div>
               </div>
             </div>
@@ -2653,6 +2658,18 @@
       if (!t) cerrarPropios();
       else { state.propiosAbierto = t; renderEpisodiosPropios(t); }
     }
+  });
+
+  $('#xuperLiveCard').addEventListener('click', (ev) => {
+    const s = ev.target.closest('.xl-stat');
+    if (!s) return;
+    const nota = $('#xlNota');
+    const txt = s.dataset.info || '';
+    if (!nota || !txt) return;
+    if (!nota.hidden && nota.dataset.de === txt) { nota.hidden = true; return; }
+    nota.dataset.de = txt;
+    nota.textContent = txt;
+    nota.hidden = false;
   });
 
   $('#btnProbarSemillas').addEventListener('click', async () => {
