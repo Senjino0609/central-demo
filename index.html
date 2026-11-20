@@ -290,6 +290,29 @@
   .idx-changes .chg.neg .icon{color:#ffb3c0}
   .idx-changes .ok{display:inline-flex;align-items:center;gap:4px;font-size:10px;color:var(--muted-2)}
   .idx-changes .ok .icon{width:13px;height:13px;color:var(--green);opacity:.7}
+  .pi{position:relative;width:14px;height:14px;display:inline-grid;place-items:center;flex:0 0 auto}
+  .pi .icon{position:absolute;inset:0;width:14px;height:14px;transition:opacity .2s,transform .25s}
+  .pi .pi-ok,.pi .pi-fail{opacity:0;transform:scale(.5)}
+  #yProxima{transition:color .25s}
+  #yProxima.run .pi-cal{opacity:.3}
+  #yProxima.ok .pi-cal,#yProxima.fail .pi-cal{opacity:0;transform:scale(.5)}
+  #yProxima.ok .pi-ok{opacity:1;transform:none;color:var(--green);animation:pop .4s ease}
+  #yProxima.fail .pi-fail{opacity:1;transform:none;color:var(--red);animation:pop .4s ease}
+  #yProxima.ok{color:#b9dcbf}
+  #yProxima.fail{color:#ffb3c0}
+  @keyframes girar{to{transform:rotate(360deg)}}
+  @keyframes pop{0%{transform:scale(.35);opacity:0}60%{transform:scale(1.2)}100%{transform:scale(1);opacity:1}}
+  .refresh-ctl{margin-top:9px}
+  .refresh-btn{position:relative;width:100%;height:40px;display:flex;align-items:center;justify-content:center;gap:7px;border-radius:12px;border:1px solid var(--line);background:var(--surface-2);color:var(--text);font-size:12px;font-weight:650;overflow:hidden;transition:width .3s ease,height .3s ease,border-radius .3s ease,margin .3s ease,background .3s,border-color .3s}
+  .refresh-btn:active{transform:scale(.98)}
+  .refresh-lbl{display:inline-flex;align-items:center;gap:6px;transition:opacity .18s}
+  .refresh-spin{display:none}
+  .refresh-ctl.run .refresh-btn{width:46px;height:46px;border-radius:50%;margin:0 auto;background:rgba(232,132,90,.13);border-color:rgba(232,132,90,.42);cursor:progress}
+  .refresh-ctl.run .refresh-lbl{opacity:0;position:absolute;pointer-events:none}
+  .refresh-ctl.run .refresh-spin{display:grid;place-items:center;animation:girar .9s linear infinite}
+  .refresh-ctl.run .refresh-spin .icon{width:21px;height:21px}
+  .idx-changes.flash .chg,.idx-changes.flash .ok{animation:chipIn .45s ease both}
+  @keyframes chipIn{from{opacity:0;transform:translateY(-5px) scale(.85)}to{opacity:1;transform:none}}
   .idx-head{display:flex;align-items:center;gap:8px}
   .idx-head strong{font-size:12.5px;flex:1;min-width:0}
   .idx-head .switch{width:42px;height:24px}
@@ -584,7 +607,7 @@
           <div class="tier-card">
             <div class="tier-head">
               <span class="tier-tag t0">T0</span>
-              <div class="tier-title"><strong>Propios</strong><span id="t0Summary">—</span></div>
+              <div class="tier-title"><strong>Propios</strong></div>
               <label class="switch" aria-label="Activar Propios"><input type="checkbox" data-provider="propios"><span></span></label>
             </div>
             <div class="tier-body">
@@ -618,7 +641,7 @@
           <div class="tier-card">
             <div class="tier-head">
               <span class="tier-tag t1">T1</span>
-              <div class="tier-title"><strong>Índices</strong><span id="t1Summary">—</span></div>
+              <div class="tier-title"><strong>Índices</strong></div>
             </div>
             <div class="tier-body">
               <div class="idx-cards">
@@ -637,10 +660,22 @@
                   </div>
                   <div class="idx-meta" id="yMeta">
                     <span class="meta-item" id="yUltima" title="Última corrida"><svg class="icon icon-sm"><use href="#i-clock"></use></svg><span>—</span></span>
-                    <span class="meta-item" id="yProxima" title="Próxima actualización automática"><svg class="icon icon-sm"><use href="#i-calendar"></use></svg><span>—</span></span>
+                    <span class="meta-item" id="yProxima" title="Próxima actualización automática">
+                      <span class="pi">
+                        <svg class="icon icon-sm pi-cal"><use href="#i-calendar"></use></svg>
+                        <svg class="icon icon-sm pi-ok"><use href="#i-check"></use></svg>
+                        <svg class="icon icon-sm pi-fail"><use href="#i-x"></use></svg>
+                      </span>
+                      <span class="ptxt">—</span>
+                    </span>
                   </div>
                   <div class="idx-changes" id="yCambios"></div>
-                  <button class="btn sm" id="btnRefreshYandex" style="width:100%;margin-top:9px"><svg class="icon icon-sm"><use href="#i-refresh"></use></svg> Actualizar índice</button>
+                  <div class="refresh-ctl" id="refreshCtl">
+                    <button class="refresh-btn" id="btnRefreshYandex" type="button">
+                      <span class="refresh-lbl"><svg class="icon icon-sm"><use href="#i-refresh"></use></svg> Actualizar índice</span>
+                      <span class="refresh-spin"><svg class="icon"><use href="#i-refresh"></use></svg></span>
+                    </button>
+                  </div>
                   <details class="mini">
                     <summary>Historial de corridas</summary>
                     <div class="list" id="refreshHistory" style="margin-top:8px"></div>
@@ -671,7 +706,7 @@
           <div class="tier-card">
             <div class="tier-head">
               <span class="tier-tag t2">T2</span>
-              <div class="tier-title"><strong>En vivo</strong><span id="t2Summary">—</span></div>
+              <div class="tier-title"><strong>En vivo</strong></div>
             </div>
             <div class="tier-body">
               <div class="provider-grid" id="provGridT2"></div>
@@ -694,7 +729,7 @@
           <div class="tier-card">
             <div class="tier-head">
               <span class="tier-tag t3">T3</span>
-              <div class="tier-title"><strong>Web y puentes</strong><span id="t3Summary">—</span></div>
+              <div class="tier-title"><strong>Web y puentes</strong></div>
             </div>
             <div class="tier-body">
               <div class="provider-grid" id="provGridT3"></div>
@@ -880,6 +915,9 @@
     bridge: null,
     refresh: null,
     refreshTimer: null,
+    refreshResult: null,
+    resultTimer: null,
+    flashAt: 0,
     cacheGroups: new Map(),
     cacheFilter: '',
     cacheType: 'all',
@@ -1146,7 +1184,31 @@
       return { ok: true, providers: DEMO.state.providers };
     }
     if (p === '/api/dash/settings') return { ok: true, settings: DEMO.state.settings };
-    if (p === '/api/dash/refresh') { toast('Demo: la actualización no se ejecuta'); return { ok: true }; }
+    if (p === '/api/dash/refresh') {
+      if (DEMO.refresh.running) return { ok: true };
+      DEMO.refresh.running = true;
+      DEMO.refresh.inicio = new Date().toISOString();
+      const exito = Math.random() < 0.82;
+      const delta = { series: demoRnd(0, 4), episodios: demoRnd(0, 420), peliculas: demoRnd(0, 14), episodiosExistentes: demoRnd(0, 90), seriesActualizadas: demoRnd(0, 25) };
+      setTimeout(() => {
+        DEMO.refresh.running = false;
+        DEMO.refresh.fin_ts = Math.floor(Date.now() / 1000);
+        DEMO.refresh.ok = exito;
+        DEMO.refresh.error = exito ? '' : 'B2 no respondió';
+        DEMO.refresh.seg = demoRnd(22, 80);
+        if (exito) {
+          DEMO.refresh.delta = delta;
+          const ix = DEMO.refresh.indice;
+          DEMO.refresh.indice = Object.assign({}, ix, {
+            series: ix.series + delta.series,
+            episodios: ix.episodios + delta.episodios + delta.episodiosExistentes,
+            peliculas: ix.peliculas + delta.peliculas
+          });
+          DEMO.state.indice = DEMO.refresh.indice;
+        }
+      }, demoRnd(2400, 3800));
+      return { ok: true };
+    }
     if (p === '/api/dash/probe') { await new Promise((r) => setTimeout(r, 350)); return { ok: true, ms: demoRnd(180, 900) }; }
     if (p === '/api/dash/propios/borrar') {
       try {
@@ -1361,12 +1423,6 @@
     const ix = state.data.indice || {};
     const xi = state.data.xuperIdx || {};
     const xu = (state.data.tier2 && state.data.tier2.xuper) || {};
-    const t1 = $('#t1Summary');
-    if (t1) t1.textContent = 'Yandex ' + fmt(ix.series) + ' · Xuper ' + (xi.cv || '—');
-    const t2 = $('#t2Summary');
-    if (t2) t2.textContent = 'Xuper en vivo ' + (xu.salud || '—') + ' · Kawaii';
-    const t3 = $('#t3Summary');
-    if (t3) t3.textContent = 'Gnula ' + (gnulaOff ? 'apagada' : 'activa') + ' · Fanpelis · Webs';
     const sd = $('#saludSummary');
     if (sd) sd.textContent = 'Xuper ' + (xu.salud || '—') + ' · ' + fmt(xu.semillas) + ' semillas';
   }
@@ -1518,7 +1574,14 @@
     if (!$('#app') || $('#app').hidden) return;
     try {
       const r = await api('/api/dash/refresh/status');
+      const antes = state.refresh || {};
       state.refresh = r;
+      if (antes.running && !r.running) {
+        state.refreshResult = { ok: r.ok !== false, at: Date.now(), texto: textoResultado(r) };
+        state.flashAt = Date.now();
+        clearTimeout(state.resultTimer);
+        state.resultTimer = setTimeout(() => { state.refreshResult = null; renderRefresh(); }, 5200);
+      }
       renderRefresh();
       if (r.running) {
         clearTimeout(state.refreshTimer);
@@ -1539,6 +1602,13 @@
     let t = base + 3 * 86400000;
     while (t < Date.now() - 6 * 3600000) t += 3 * 86400000;
     return t;
+  }
+
+  function textoResultado(r) {
+    if (!r || r.ok === false) return 'Falló' + (r && r.error ? ': ' + r.error : '');
+    const d = r.delta || {};
+    const cambios = (Number(d.series) || 0) + (Number(d.episodios) || 0) + (Number(d.episodiosExistentes) || 0) + (Number(d.peliculas) || 0);
+    return cambios ? 'Listo' : 'Listo · sin cambios';
   }
 
   function fechaCorta(ts) {
@@ -1578,17 +1648,39 @@
 
     // Próxima automática: icono de calendario.
     const prox = $('#yProxima');
-    if (prox) {
-      const t = proximaCorrida(r);
-      const span = prox.querySelector('span');
-      if (span) span.textContent = t ? fechaCorta(t) : '—';
-      prox.classList.toggle('alerta', !!(t && t < Date.now()));
-      prox.title = 'Próxima automática (3–4 AM Colombia, cada 3 días)';
+    const ctl = $('#refreshCtl');
+    const ptxt = prox ? prox.querySelector('.ptxt') : null;
+    const res = state.refreshResult;
+    const mostrando = !!(res && Date.now() - res.at < 5400);
+    if (prox && ptxt) {
+      if (r.running) {
+        prox.classList.remove('ok', 'fail', 'alerta');
+        prox.classList.add('run');
+        ptxt.textContent = 'Actualizando…';
+        prox.title = 'Actualizando el índice…';
+      } else if (mostrando) {
+        prox.classList.remove('run', 'alerta');
+        prox.classList.add(res.ok ? 'ok' : 'fail');
+        ptxt.textContent = res.texto;
+        prox.title = res.texto;
+      } else {
+        if (state.refreshResult) state.refreshResult = null;
+        prox.classList.remove('run', 'ok', 'fail');
+        const t = proximaCorrida(r);
+        ptxt.textContent = t ? fechaCorta(t) : '—';
+        prox.classList.toggle('alerta', !!(t && t < Date.now()));
+        prox.title = 'Próxima automática (3–4 AM Colombia, cada 3 días)';
+      }
     }
+    if (ctl) ctl.classList.toggle('run', !!r.running);
+    if (btn) btn.disabled = !!r.running;
 
     // Cambios: solo icono + número. Sin cambios, un check discreto.
     const cambiosEl = $('#yCambios');
-    if (cambiosEl) {
+    if (cambiosEl && r.running) {
+      cambiosEl.innerHTML = '';
+      cambiosEl.classList.remove('flash');
+    } else if (cambiosEl) {
       const d = r.delta || {};
       const series = Number(d.series) || 0;
       const eps = (Number(d.episodios) || 0) + (Number(d.episodiosExistentes) || 0);
@@ -1604,21 +1696,15 @@
             '<svg class="icon"><use href="#' + ic + '"></use></svg>' + (v > 0 ? '+' : '') + v + '</span>'
           ).join('')
         : '<span class="ok" title="Sin cambios en la última corrida"><svg class="icon"><use href="#i-check"></use></svg></span>';
+      const flash = state.flashAt && Date.now() - state.flashAt < 1400;
+      cambiosEl.classList.toggle('flash', !!flash);
       if (r.pendienteB2) {
         cambiosEl.insertAdjacentHTML('beforeend',
           '<span class="chg neg" title="Subida a B2 pendiente"><svg class="icon"><use href="#i-cloud"></use></svg>B2</span>');
       }
     }
 
-    if (r.running) {
-      if (btn) { btn.disabled = true; btn.textContent = 'Actualizando…'; }
-    } else {
-      clearTimeout(state.refreshTimer);
-      if (btn) {
-        btn.disabled = false;
-        btn.innerHTML = '<svg class="icon icon-sm"><use href="#i-refresh"></use></svg> Actualizar índice';
-      }
-    }
+    clearTimeout(state.refreshTimer);
 
     if (logsEl) {
       const logs = Array.isArray(r.logs) ? r.logs : [];
@@ -1654,7 +1740,12 @@
       const r = await api('/api/dash/refresh', { method: 'POST', body: JSON.stringify({}) });
       if (r.ok) {
         toast('Actualización arrancada');
-        state.refresh = { running: true, inicio: new Date().toISOString() };
+        state.refreshResult = null;
+        state.flashAt = 0;
+        state.refresh = Object.assign({}, state.refresh || {}, {
+          running: true,
+          inicio: new Date().toISOString()
+        });
         renderRefresh();
         clearTimeout(state.refreshTimer);
         state.refreshTimer = setTimeout(loadRefresh, 4000);
@@ -2226,8 +2317,6 @@
       set('b2Libre', cuota ? gb(libre) : '—');
       const bar = $('#b2Bar');
       if (bar) bar.style.width = cuota ? Math.min(100, (usado / cuota) * 100).toFixed(1) + '%' : '0%';
-      const t0 = $('#t0Summary');
-      if (t0) t0.textContent = 'Backblaze · ' + (Number(p.titulos) || 0) + ((Number(p.titulos) === 1) ? ' título' : ' títulos');
       const det = $('#b2Detalle');
       if (det) {
         const nt = Number(p.titulos) || 0;
