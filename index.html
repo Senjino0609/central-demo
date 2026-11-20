@@ -127,6 +127,7 @@
   .row-sub{display:flex;align-items:center;gap:6px;flex-wrap:wrap;margin-top:4px;font-size:10.5px;color:var(--muted)}
   .row-side{text-align:right;flex:0 0 auto}
   .row-time{font-size:10.5px;color:var(--muted-2);white-space:nowrap}
+  .row-when{color:var(--muted-2);display:inline-flex;align-items:center}
   .badge{display:inline-flex;align-items:center;gap:4px;padding:3px 7px;border-radius:999px;font-size:9.5px;font-weight:700;letter-spacing:.02em;border:1px solid transparent;white-space:nowrap}
   .badge.v{background:rgba(139,108,255,.14);color:#c5b8ff;border-color:rgba(139,108,255,.22)}
   .badge.c{background:rgba(232,132,90,.12);color:#ffd2ad;border-color:rgba(232,132,90,.22)}
@@ -231,7 +232,8 @@
   .statusband .hero-pill{margin:0;padding:6px 10px;font-size:10.5px}
   .status-strip{position:relative;z-index:1;margin-top:10px}
   .st-head{display:flex;align-items:center;gap:7px;font-size:12px;font-weight:650;color:var(--text)}
-  .st-head .pulse{width:8px;height:8px}
+  .st-head.warn{color:#ffd58a}
+  .st-head.bad{color:#ffb3c0}
   .st-chain{display:flex;align-items:flex-start;margin-top:11px}
   .st-node{display:flex;flex-direction:column;align-items:center;gap:4px;flex:0 0 auto;min-width:0;padding:0 2px;font-size:8.5px;color:var(--muted-2)}
   .st-node b{width:8px;height:8px;border-radius:50%;background:var(--green);flex:0 0 auto;box-shadow:0 0 0 3px rgba(134,192,143,.10)}
@@ -1507,7 +1509,7 @@
       return String(s.state || 'con problemas');
     };
     el.innerHTML =
-      '<div class="st-head"><span class="pulse ' + general + '"></span><span>' + esc(frase) + '</span></div>' +
+      '<div class="st-head ' + general + '"><span>' + esc(frase) + '</span></div>' +
       '<div class="st-chain">' + nodos.map((n, i) =>
         (i ? '<i class="st-link"></i>' : '') +
         '<span class="st-node ' + n.c + '" title="' + attr(n.nombre + ': ' + texto(n)) + '"><b></b><span>' + esc(n.nombre) + '</span></span>'
@@ -2088,8 +2090,9 @@
     return '<article class="row">' +
       '<div class="row-ico"><svg class="icon icon-sm"><use href="#' + (isSeries ? 'i-series' : 'i-movie') + '"></use></svg></div>' +
       '<div class="row-main"><div class="row-title">' + esc(x.title || x.id || 'Sin título') + '</div>' +
-      '<div class="row-sub">' + srcs.map(sourceBadge).join('') + '<span>' + (isSeries ? 'serie' : 'película') + '</span></div></div>' +
-      '<div class="row-side"><div class="row-time">' + (live ? '<span class="dot ok live" style="display:inline-block;margin-right:5px"></span>' : '') + timeAgo(x.ts) + '</div></div>' +
+      '<div class="row-sub">' + srcs.map(sourceBadge).join('') + '<span>' + (isSeries ? 'serie' : 'película') + '</span>' +
+      '<span>·</span><span class="row-when">' + (live ? '<span class="dot ok live" style="display:inline-block;margin-right:4px"></span>' : '') + timeAgo(x.ts) + '</span>' +
+      '</div></div>' +
       '</article>';
   }
 
