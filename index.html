@@ -294,7 +294,6 @@
   .pi .icon{position:absolute;inset:0;width:14px;height:14px;transition:opacity .2s,transform .25s}
   .pi .pi-ok,.pi .pi-fail{opacity:0;transform:scale(.5)}
   #yProxima{transition:color .25s}
-  #yProxima.run .pi-cal{opacity:.3}
   #yProxima.ok .pi-cal,#yProxima.fail .pi-cal{opacity:0;transform:scale(.5)}
   #yProxima.ok .pi-ok{opacity:1;transform:none;color:var(--green);animation:pop .4s ease}
   #yProxima.fail .pi-fail{opacity:1;transform:none;color:var(--red);animation:pop .4s ease}
@@ -307,10 +306,10 @@
   .refresh-btn:active{transform:scale(.98)}
   .refresh-lbl{display:inline-flex;align-items:center;gap:6px;transition:opacity .18s}
   .refresh-spin{display:none}
-  .refresh-ctl.run .refresh-btn{width:46px;height:46px;border-radius:50%;margin:0 auto;background:rgba(232,132,90,.13);border-color:rgba(232,132,90,.42);cursor:progress}
+  .refresh-ctl.run .refresh-btn{width:40px;height:40px;border-radius:50%;margin:0 auto;background:rgba(232,132,90,.10);border-color:rgba(232,132,90,.32);cursor:progress}
   .refresh-ctl.run .refresh-lbl{opacity:0;position:absolute;pointer-events:none}
   .refresh-ctl.run .refresh-spin{display:grid;place-items:center;animation:girar .9s linear infinite}
-  .refresh-ctl.run .refresh-spin .icon{width:21px;height:21px}
+  .refresh-ctl.run .refresh-spin .icon{width:16px;height:16px}
   .idx-changes.flash .chg,.idx-changes.flash .ok{animation:chipIn .45s ease both}
   @keyframes chipIn{from{opacity:0;transform:translateY(-5px) scale(.85)}to{opacity:1;transform:none}}
   .idx-head{display:flex;align-items:center;gap:8px}
@@ -1578,7 +1577,7 @@
       state.refresh = r;
       if (antes.running && !r.running) {
         state.refreshResult = { ok: r.ok !== false, at: Date.now(), texto: textoResultado(r) };
-        state.flashAt = Date.now();
+        state.flashAt = r.ok !== false ? Date.now() : 0;
         clearTimeout(state.resultTimer);
         state.resultTimer = setTimeout(() => { state.refreshResult = null; renderRefresh(); }, 5200);
       }
@@ -1594,7 +1593,7 @@
   }
 
   function proximaCorrida(r) {
-    const ms = r.running ? (r.inicio ? Date.parse(r.inicio) : 0) : (Number(r.fin_ts) ? Number(r.fin_ts) * 1000 : 0);
+    const ms = Number(r.fin_ts) ? Number(r.fin_ts) * 1000 : 0;
     if (!ms) return null;
     const diaCO = new Date(ms - 5 * 3600 * 1000).toISOString().slice(0, 10);
     const base = Date.parse(diaCO + 'T08:00:00Z'); // 3:00 en Colombia
@@ -1640,9 +1639,9 @@
     }
 
     // Última corrida: solo el tiempo, con icono.
-    const ms = r.running ? (r.inicio ? Date.parse(r.inicio) : 0) : (Number(r.fin_ts) ? Number(r.fin_ts) * 1000 : 0);
+    const ms = Number(r.fin_ts) ? Number(r.fin_ts) * 1000 : 0;
     const spanUltima = ultimaEl.querySelector('span');
-    if (spanUltima) spanUltima.textContent = r.running ? 'ahora' : (ms ? timeAgo(ms) : 'sin datos');
+    if (spanUltima) spanUltima.textContent = ms ? timeAgo(ms) : 'sin datos';
     ultimaEl.classList.toggle('alerta', !!(!r.running && r.ok === false));
     ultimaEl.title = r.error ? 'La última falló: ' + r.error : 'Última corrida';
 
@@ -1653,19 +1652,14 @@
     const res = state.refreshResult;
     const mostrando = !!(res && Date.now() - res.at < 5400);
     if (prox && ptxt) {
-      if (r.running) {
-        prox.classList.remove('ok', 'fail', 'alerta');
-        prox.classList.add('run');
-        ptxt.textContent = 'Actualizando…';
-        prox.title = 'Actualizando el índice…';
-      } else if (mostrando) {
-        prox.classList.remove('run', 'alerta');
+      if (mostrando) {
+        prox.classList.remove('alerta');
         prox.classList.add(res.ok ? 'ok' : 'fail');
         ptxt.textContent = res.texto;
         prox.title = res.texto;
       } else {
         if (state.refreshResult) state.refreshResult = null;
-        prox.classList.remove('run', 'ok', 'fail');
+        prox.classList.remove('ok', 'fail');
         const t = proximaCorrida(r);
         ptxt.textContent = t ? fechaCorta(t) : '—';
         prox.classList.toggle('alerta', !!(t && t < Date.now()));
@@ -1739,7 +1733,6 @@
     try {
       const r = await api('/api/dash/refresh', { method: 'POST', body: JSON.stringify({}) });
       if (r.ok) {
-        toast('Actualización arrancada');
         state.refreshResult = null;
         state.flashAt = 0;
         state.refresh = Object.assign({}, state.refresh || {}, {
