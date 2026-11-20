@@ -1,0 +1,2644 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#0b0a09">
+<meta name="application-name" content="Central">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Central">
+<title>Central Admin · Demo</title>
+<style>
+  :root{
+    --bg:#000;
+    --surface:rgba(21,16,13,.90);
+    --surface-2:rgba(30,23,18,.92);
+    --surface-3:rgba(35,28,22,.86);
+    --line:rgba(255,255,255,.09);
+    --line-strong:rgba(255,255,255,.16);
+    --text:#f6f0e8;
+    --muted:#a99d92;
+    --muted-2:#6f645a;
+    --violet:#e8845a;
+    --cyan:#f2b06b;
+    --green:#86c08f;
+    --amber:#f0a45e;
+    --red:#e2655c;
+    --blue:#8fa8c9;
+    --radius:22px;
+    --radius-sm:14px;
+    --blur:blur(20px) saturate(145%);
+    --shadow:0 24px 70px rgba(0,0,0,.55), inset 0 1px 0 rgba(255,255,255,.06);
+    --font:system-ui,-apple-system,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif;
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0;padding:0;background:var(--bg);color:var(--text);font-family:var(--font);-webkit-font-smoothing:antialiased}
+  body{min-height:100dvh;overflow-x:hidden}
+  button,input,select{font:inherit;color:inherit}
+  button{cursor:pointer;border:0;background:none}
+  a{color:inherit}
+  ::selection{background:rgba(232,132,90,.30)}
+  .app{max-width:1280px;margin:0 auto;padding:0 14px 104px}
+  .hidden{display:none!important}
+  [hidden]{display:none!important}
+  .gate[hidden],.app[hidden]{display:none!important}
+  .muted{color:var(--muted)}
+  .mono{font-variant-numeric:tabular-nums;font-feature-settings:"tnum"}
+  .icon{width:22px;height:22px;flex:0 0 auto;display:block}
+  .icon-sm{width:18px;height:18px}
+  .icon-lg{width:26px;height:26px}
+  .sr{position:absolute!important;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0}
+
+  /* ---------- top bar ---------- */
+  .topbar{position:sticky;top:0;z-index:50;display:flex;align-items:center;justify-content:space-between;gap:12px;padding:12px 4px 10px;background:linear-gradient(180deg,rgba(0,0,0,.92),rgba(0,0,0,.55) 70%,transparent);backdrop-filter:blur(16px)}
+  .brand{display:flex;align-items:center;gap:10px;min-width:0}
+  .brand-mark{width:40px;height:40px;border-radius:13px;overflow:hidden;background:#000;border:1px solid var(--line);box-shadow:0 0 28px rgba(232,132,90,.22);flex:0 0 auto}
+  .brand-mark img{width:100%;height:100%;object-fit:cover;display:block}
+  .brand strong{display:block;font-size:15px;letter-spacing:.2px;line-height:1.1}
+  .brand span{display:block;font-size:11px;color:var(--muted);margin-top:2px}
+  .top-actions{display:flex;align-items:center;gap:8px}
+  .icon-btn{width:42px;height:42px;border-radius:14px;display:grid;place-items:center;background:var(--surface);border:1px solid var(--line);color:var(--text);transition:transform .15s,border-color .15s,background .15s}
+  .icon-btn:active{transform:scale(.94)}
+  .icon-btn:hover{border-color:var(--line-strong);background:var(--surface-2)}
+
+  /* ---------- top tabs (desktop) ---------- */
+  .top-tabs{display:none;gap:6px;margin:4px 0 18px;padding:5px;border:1px solid var(--line);border-radius:16px;background:rgba(10,10,14,.6);width:max-content}
+  .top-tabs button{padding:10px 16px;border-radius:11px;color:var(--muted);font-size:13px;font-weight:600;transition:.15s}
+  .top-tabs button.active{color:#fff;background:rgba(232,132,90,.16);box-shadow:inset 0 0 0 1px rgba(232,132,90,.22)}
+
+  /* ---------- views ---------- */
+  .view{display:none}
+  .view.active{display:block}
+
+  /* ---------- hero ---------- */
+  .eyebrow{margin:0;text-transform:uppercase;letter-spacing:.22em;font-size:10px;font-weight:700;color:var(--cyan);opacity:.9}
+  .hero-pill{display:inline-flex;align-items:center;gap:8px;padding:8px 12px;border-radius:999px;border:1px solid var(--line);background:rgba(12,10,9,.82);font-size:11.5px;color:var(--muted);margin-bottom:18px}
+  .dot{width:7px;height:7px;border-radius:50%;background:var(--muted);box-shadow:0 0 0 4px rgba(255,255,255,.04);flex:0 0 auto}
+  .dot.ok{background:var(--green);box-shadow:0 0 12px rgba(34,255,167,.75)}
+  .dot.warn{background:var(--amber);box-shadow:0 0 12px rgba(255,176,32,.7)}
+  .dot.bad{background:var(--red);box-shadow:0 0 12px rgba(255,77,109,.7)}
+  .dot.live{animation:pulse 1.8s infinite}
+  @keyframes pulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.45;transform:scale(.8)}}
+
+  .kpi-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;width:100%;max-width:760px;margin-top:2px}
+  .kpi{position:relative;overflow:hidden;text-align:left;padding:14px 13px 13px;border-radius:18px;border:1px solid var(--line);background:rgba(22,17,13,.9);box-shadow:inset 0 1px 0 rgba(255,255,255,.05)}
+  .kpi::before{content:"";position:absolute;inset:-50% 50% 55% -40%;background:radial-gradient(closest-side,rgba(232,132,90,.16),transparent);pointer-events:none}
+  .kpi-top{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:8px}
+  .kpi-ico{width:34px;height:34px;border-radius:50%;display:grid;place-items:center;background:transparent;border:1px solid rgba(232,132,90,.28);color:var(--cyan)}
+  .kpi-label{font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:.07em;font-weight:700;line-height:1.2;white-space:nowrap}
+  .kpi-value{font-size:26px;font-weight:800;letter-spacing:-.04em;line-height:1;font-variant-numeric:tabular-nums}
+  .kpi-sub{font-size:10.5px;color:var(--muted-2);margin-top:5px}
+
+
+  /* ---------- sections ---------- */
+  .section-head{display:flex;align-items:flex-end;justify-content:space-between;gap:12px;margin:24px 2px 12px}
+  .section-head h2{margin:3px 0 0;font-size:20px;letter-spacing:-.03em}
+  .section-head p{margin:0}
+  .section-head.small{margin-top:20px}
+  .hint{font-size:11.5px;color:var(--muted)}
+  .toolbar{display:flex;gap:8px;margin-bottom:12px;flex-wrap:wrap}
+  .field{display:flex;flex-direction:column;gap:6px}
+  .field label{font-size:11px;color:var(--muted);font-weight:600;letter-spacing:.04em}
+  input[type="text"],input[type="search"],input[type="password"],input[type="number"],select{width:100%;padding:11px 12px;border-radius:12px;border:1px solid var(--line);background:rgba(12,12,18,.78);color:var(--text);outline:none;transition:border-color .15s,box-shadow .15s}
+  input:focus,select:focus{border-color:rgba(232,132,90,.65);box-shadow:0 0 0 3px rgba(232,132,90,.14)}
+  input::placeholder{color:var(--muted-2)}
+  .toolbar input,.toolbar select{flex:1;min-width:140px}
+  .btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;padding:11px 14px;border-radius:12px;border:1px solid var(--line);background:var(--surface-2);color:var(--text);font-size:12.5px;font-weight:650;transition:transform .15s,border-color .15s,background .15s;white-space:nowrap}
+  .btn:active{transform:scale(.97)}
+  .btn:hover{border-color:var(--line-strong)}
+  .btn.primary{border:0;background:var(--cyan);color:#17100b;font-weight:800;box-shadow:0 10px 34px rgba(232,132,90,.22)}
+  .btn.ghost{background:transparent}
+  .btn.danger{border-color:rgba(255,77,109,.28);color:#ffb3c0;background:rgba(255,77,109,.08)}
+  .btn.sm{padding:8px 10px;font-size:11.5px;border-radius:10px}
+  .btn.icon-only{width:38px;height:38px;padding:0}
+  .segmented{display:flex;gap:4px;padding:4px;border:1px solid var(--line);border-radius:14px;background:rgba(12,10,9,.85);width:max-content;max-width:100%;overflow:auto}
+  .segmented button{padding:8px 12px;border-radius:10px;color:var(--muted);font-size:11.5px;font-weight:650;white-space:nowrap}
+  .segmented button.active{color:#fff;background:rgba(232,132,90,.18);box-shadow:inset 0 0 0 1px rgba(232,132,90,.22)}
+
+  /* ---------- lists / cards ---------- */
+  .list{display:flex;flex-direction:column;gap:8px}
+  .row{display:flex;align-items:center;gap:12px;padding:12px;border-radius:16px;border:1px solid var(--line);background:rgba(18,14,12,.9)}
+  .row-ico{width:34px;height:34px;border-radius:0;display:grid;place-items:center;flex:0 0 auto;background:transparent;border:0;color:var(--cyan)}
+  .row-main{min-width:0;flex:1}
+  .row-title{font-size:13px;font-weight:650;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .row-title.wrap{white-space:normal;line-height:1.25;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+  .row-sub{display:flex;align-items:center;gap:6px;flex-wrap:wrap;margin-top:4px;font-size:10.5px;color:var(--muted)}
+  .row-side{text-align:right;flex:0 0 auto}
+  .row-time{font-size:10.5px;color:var(--muted-2);white-space:nowrap}
+  .badge{display:inline-flex;align-items:center;gap:4px;padding:3px 7px;border-radius:999px;font-size:9.5px;font-weight:700;letter-spacing:.02em;border:1px solid transparent;white-space:nowrap}
+  .badge.v{background:rgba(139,108,255,.14);color:#c5b8ff;border-color:rgba(139,108,255,.22)}
+  .badge.c{background:rgba(232,132,90,.12);color:#ffd2ad;border-color:rgba(232,132,90,.22)}
+  .badge.g{background:rgba(34,255,167,.10);color:#9dffd4;border-color:rgba(34,255,167,.18)}
+  .badge.a{background:rgba(255,176,32,.10);color:#ffd58a;border-color:rgba(255,176,32,.18)}
+  .badge.r{background:rgba(255,77,109,.10);color:#ffb3c0;border-color:rgba(255,77,109,.18)}
+  .badge.m{background:rgba(255,255,255,.06);color:var(--muted);border-color:var(--line)}
+  .empty{padding:26px 16px;text-align:center;border:1px dashed var(--line);border-radius:18px;color:var(--muted);font-size:12px;line-height:1.6}
+  .empty strong{display:block;color:var(--text);font-size:13px;margin-bottom:4px}
+
+  /* ---------- cache ---------- */
+  .cache-list{display:flex;flex-direction:column;gap:10px}
+  .cache-card{display:grid;grid-template-columns:auto minmax(0,1fr);align-items:start;gap:12px;padding:13px;border-radius:18px;border:1px solid var(--line);background:var(--surface)}
+  .cache-ico{width:34px;height:34px;border-radius:0;display:grid;place-items:center;background:transparent;border:0;color:var(--cyan)}
+  .cache-title{font-size:13.5px;font-weight:700;line-height:1.25;word-break:break-word}
+  .cache-meta{font-size:10.5px;color:var(--muted);margin-top:3px;display:flex;gap:6px;flex-wrap:wrap;align-items:center}
+  .chips{display:flex;gap:5px;flex-wrap:wrap;margin-top:7px}
+  .chip{font-size:9.5px;padding:3px 6px;border-radius:7px;background:rgba(255,255,255,.05);border:1px solid var(--line);color:var(--muted)}
+  .ep-item{display:inline-flex;align-items:center;gap:3px;margin:0 3px 3px 0}
+  .chip.del{padding:3px 6px;line-height:1;color:#ffb3c0;border-color:rgba(255,77,109,.35);background:rgba(255,77,109,.08)}
+  .cache-actions{display:flex;gap:6px;flex-wrap:wrap;align-items:center;margin-top:10px;grid-column:1/-1}
+  .cache-actions .btn{flex:1 1 auto;min-width:0;padding-left:10px;padding-right:10px}
+  .cache-actions .btn.danger{flex:0 0 46px;min-width:46px;justify-content:center}
+  .eps-wrap.oculto{display:none}
+  .ttl-list{grid-column:1/-1;display:flex;flex-direction:column;gap:5px;margin-top:10px;padding-top:10px;border-top:1px solid var(--line)}
+  .btn.activo{border-color:rgba(232,132,90,.45);background:rgba(232,132,90,.12)}
+  .ttl-row{display:flex;align-items:center;gap:8px;font-size:11.5px}
+  .ttl-row .mono{flex:1;color:var(--text)}
+  .ttl{font-size:10px;font-weight:700;color:var(--green)}
+  .ttl.low{color:var(--amber)}
+  .ttl.crit{color:var(--red)}
+
+  /* ---------- panel tier 2 ---------- */
+  .t2-back { position:fixed; inset:0; background:rgba(6,8,12,.72); backdrop-filter:blur(4px); display:none; z-index:80; align-items:center; justify-content:center; padding:20px; }
+  .t2-back.open { display:flex; }
+  .t2-card { background:rgba(17,13,11,.98); border:1px solid var(--line); border-radius:20px; width:min(680px,100%); max-height:88dvh; overflow:auto; padding:20px 22px; box-shadow:0 30px 90px rgba(0,0,0,.8); }
+  .t2-head { display:flex; align-items:flex-start; justify-content:space-between; gap:12px; margin-bottom:4px; }
+  .t2-head h3 { margin:0; font-size:18px; }
+  .t2-head p { margin:4px 0 0; color:var(--muted); font-size:12.5px; }
+  .t2-x { background:none; border:0; color:var(--muted); font-size:22px; cursor:pointer; line-height:1; }
+  .t2-step { border:1px solid var(--line); border-radius:12px; padding:12px 14px; margin-top:12px; }
+  .t2-step header { display:flex; align-items:center; justify-content:space-between; gap:10px; }
+  .t2-step h4 { margin:0; font-size:14px; }
+  .t2-step .dato { color:var(--muted); font-size:12px; margin-top:6px; }
+  .t2-pill { display:inline-block; padding:2px 8px; border-radius:999px; font-size:11px; font-weight:600; }
+  .t2-ok { background:rgba(26,127,55,.18); color:#7ee2a8; }
+  .t2-no { background:rgba(164,14,38,.2); color:#ff8fa3; }
+  .t2-off { background:#232833; color:#9aa3b2; }
+  .t2-lento { background:rgba(154,103,0,.2); color:#f0c26b; }
+  /* ---------- providers ---------- */
+  .provider-grid{display:grid;grid-template-columns:1fr;gap:10px}
+  .provider{display:flex;align-items:center;gap:12px;padding:11px 12px;border-radius:16px;border:1px solid var(--line);background:var(--surface)}
+  .provider-ico{width:36px;height:36px;border-radius:50%;display:grid;place-items:center;flex:0 0 auto;border:1px solid rgba(232,132,90,.20);background:transparent!important;color:var(--cyan)}
+  .provider-ico.v{background:#2a1c15}
+  .provider-ico.c{background:#2a2016}
+  .provider-ico.g{background:#1c241b}
+  .provider-ico.a{background:#2a1715}
+  .provider-ico.p{background:#2a1a1e}
+  .provider-main{min-width:0;flex:1}
+  .provider-main strong{display:block;font-size:13.5px}
+  .provider-main span{display:block;font-size:10.5px;color:var(--muted);margin-top:3px;line-height:1.4}
+  .switch{position:relative;display:inline-flex;flex:0 0 auto;width:48px;height:28px}
+  .switch input{position:absolute;opacity:0;width:100%;height:100%;margin:0;cursor:pointer;z-index:2}
+  .switch span{position:absolute;inset:0;border-radius:999px;background:rgba(255,255,255,.10);border:1px solid var(--line);transition:.2s}
+  .switch span::after{content:"";position:absolute;width:22px;height:22px;left:2px;top:2px;border-radius:50%;background:#8b90a6;transition:.2s;box-shadow:0 2px 6px rgba(0,0,0,.5)}
+  .switch input:checked + span{background:rgba(232,132,90,.55);border-color:rgba(232,132,90,.55);box-shadow:0 0 20px rgba(232,132,90,.28)}
+  .switch input:checked + span::after{transform:translateX(20px);background:#fff}
+  .switch input:focus-visible + span{outline:2px solid var(--cyan);outline-offset:2px}
+
+  /* ---------- bridge ---------- */
+  .bridge-grid{display:grid;grid-template-columns:1fr;gap:10px}
+  .bridge-card{padding:15px;border-radius:18px;border:1px solid var(--line);background:var(--surface)}
+  .bridge-head{display:flex;align-items:center;justify-content:space-between;gap:10px}
+  .bridge-name{display:flex;align-items:center;gap:9px;font-size:13px;font-weight:700}
+  .bridge-url{font-size:10.5px;color:var(--muted);word-break:break-all;margin-top:8px;line-height:1.5}
+  .bridge-foot{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-top:8px;font-size:10.5px;color:var(--muted)}
+  .bridge-state{display:inline-flex;align-items:center;gap:6px;font-size:10.5px;font-weight:700}
+
+  /* ---------- settings ---------- */
+  .settings-grid{display:grid;grid-template-columns:1fr;gap:10px}
+  .settings-card{padding:16px;border-radius:18px;border:1px solid var(--line);background:var(--surface)}
+  .settings-card h3{margin:0 0 12px;font-size:13px;letter-spacing:.01em}
+  .form-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+  .form-grid .field.full{grid-column:1/-1}
+  .check{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:10px 0;border-top:1px solid rgba(255,255,255,.05);font-size:12px}
+  .check:first-of-type{border-top:0}
+  .check small{display:block;color:var(--muted);font-size:10px;margin-top:2px;line-height:1.4}
+  .check input{width:18px;height:18px;accent-color:#e8845a;flex:0 0 auto}
+  .danger-zone{margin-top:12px;padding:14px;border-radius:16px;border:1px solid rgba(255,77,109,.18);background:rgba(255,77,109,.04)}
+  .danger-zone h3{color:#ffb3c0;margin:0 0 8px;font-size:12px}
+  .danger-zone .btn{margin:4px 4px 0 0}
+
+  /* ---------- inicio compacto ---------- */
+  .statusband{position:relative;overflow:hidden;border-radius:22px;border:1px solid var(--line);background:radial-gradient(70% 120% at 20% 0%,rgba(232,132,90,.16),transparent 60%),#0a0806;padding:14px;box-shadow:0 18px 50px rgba(0,0,0,.5)}
+  .statusband::before{content:"";position:absolute;inset:-40% -10%;background:radial-gradient(40% 45% at 70% 30%,rgba(232,132,90,.16),transparent 70%);pointer-events:none}
+  body.sin-glow .statusband::before{opacity:.3}
+  .statusband-top{position:relative;z-index:1;display:flex;align-items:center;justify-content:space-between;gap:10px}
+  .statusband-brand{display:flex;align-items:center;gap:10px;min-width:0}
+  .brand-mark.sm{width:34px;height:34px;border-radius:11px}
+  .statusband-brand strong{display:block;font-size:14px;line-height:1.1}
+  .statusband-brand span{display:block;font-size:10.5px;color:var(--muted);margin-top:2px}
+  .statusband .hero-pill{margin:0;padding:6px 10px;font-size:10.5px}
+  .status-strip{position:relative;z-index:1;display:flex;flex-wrap:wrap;gap:5px;margin-top:10px}
+  .status-chip{display:inline-flex;align-items:center;gap:6px;flex:0 0 auto;padding:6px 9px;border-radius:999px;border:1px solid var(--line);background:rgba(12,10,9,.75);font-size:10px;color:var(--muted);white-space:nowrap}
+  .status-chip b{font-weight:700;color:var(--text);font-size:10.5px}
+  .kpi-grid.compact{margin-top:10px;gap:7px;grid-template-columns:repeat(4,minmax(0,1fr))}
+  .kpi-grid.compact .kpi{padding:9px 9px 10px;border-radius:14px;overflow:hidden}
+  .kpi-grid.compact .kpi-value{font-size:17px}
+  .kpi-grid.compact .kpi-ico{width:24px;height:24px}
+  .kpi-grid.compact .kpi-ico .icon{width:15px;height:15px}
+  .kpi-grid.compact .kpi-top{margin-bottom:6px;justify-content:flex-start}
+  .kpi-grid.compact .kpi-label{display:none}
+  .kpi-grid.compact .kpi-sub{font-size:9px;margin-top:3px}
+
+  /* ---------- cascada por tiers ---------- */
+  .cascade{position:relative;margin-top:6px}
+  .cascade::before{content:"";position:absolute;left:11px;top:24px;bottom:24px;width:1px;background:linear-gradient(180deg,rgba(232,132,90,.45),rgba(232,132,90,.05))}
+  .tier{position:relative;padding-left:30px;margin-top:12px}
+  .tier:first-child{margin-top:0}
+  .tier::before{content:"";position:absolute;left:7px;top:19px;width:9px;height:9px;border-radius:50%;background:var(--cyan);box-shadow:0 0 0 4px rgba(232,132,90,.12),0 0 14px rgba(232,132,90,.45)}
+  .tier-card{border:1px solid var(--line);border-radius:18px;background:var(--surface);overflow:hidden}
+  .tier-head{display:flex;align-items:center;gap:9px;padding:10px 11px;border-bottom:1px solid var(--line)}
+  .tier-tag{font-size:8.5px;font-weight:800;letter-spacing:.08em;padding:3px 7px;border-radius:999px;border:1px solid var(--line);color:var(--muted);flex:0 0 auto}
+  .tier-tag.t0{color:#ffd2ad;border-color:rgba(232,132,90,.38);background:rgba(232,132,90,.12)}
+  .tier-tag.t1{color:#bcd2ef;border-color:rgba(143,168,201,.35);background:rgba(143,168,201,.10)}
+  .tier-tag.t2{color:#ffcf9a;border-color:rgba(240,164,94,.35);background:rgba(240,164,94,.10)}
+  .tier-tag.t3{color:#b9dcbf;border-color:rgba(134,192,143,.35);background:rgba(134,192,143,.10)}
+  .tier-title{min-width:0;flex:1}
+  .tier-title strong{display:block;font-size:12.5px;line-height:1.15}
+  .tier-title span{display:block;font-size:9.5px;color:var(--muted);margin-top:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .tier-body{padding:9px}
+  .tier-body .provider-grid{gap:7px}
+  .tier-body .provider{padding:9px 10px;border-radius:13px}
+  .tier-body .provider-ico{width:28px;height:28px}
+  .tier-body .provider-main strong{font-size:12px}
+  .tier-body .provider-main span{font-size:9.5px}
+  .tier-body .settings-card{padding:11px;border-radius:13px}
+  .storage{padding:10px;border:1px solid var(--line);border-radius:14px;background:rgba(12,10,9,.45)}
+  .storage-row{display:flex;align-items:flex-start;gap:9px}
+  .storage-item{display:flex;flex-direction:column;gap:3px;min-width:0}
+  .storage-item.right{margin-left:auto;align-items:flex-end}
+  .storage-line{display:flex;align-items:center;gap:8px}
+  .stat-ico{width:30px;height:30px;border-radius:9px;display:grid;place-items:center;background:rgba(232,132,90,.11);color:var(--cyan);flex:0 0 auto}
+  .stat-ico.free{background:rgba(134,192,143,.11);color:var(--green)}
+  .storage-line strong{font-size:17px;line-height:1;font-variant-numeric:tabular-nums;white-space:nowrap}
+  .storage-label{font-size:9px;color:var(--muted);padding-left:38px}
+  .storage-item.right .storage-label{padding-left:0}
+  .bar{height:6px;border-radius:999px;background:rgba(255,255,255,.07);margin-top:9px;overflow:hidden}
+  .bar i{display:block;height:100%;border-radius:999px;background:linear-gradient(90deg,var(--cyan),var(--amber));width:0;transition:width .35s}
+  .idx-cards{display:grid;grid-template-columns:1fr;gap:8px}
+  .idx-card{padding:10px;border:1px solid var(--line);border-radius:14px;background:rgba(12,10,9,.45)}
+  .idx-meta{display:flex;flex-wrap:wrap;gap:9px;margin-top:9px;font-size:10px;color:var(--muted)}
+  .meta-item{display:inline-flex;align-items:center;gap:5px}
+  .meta-item .icon{width:13px;height:13px;color:var(--cyan)}
+  .meta-item.alerta{color:#ffd58a}
+  .meta-item.alerta .icon{color:var(--amber)}
+  .idx-changes{display:flex;gap:5px;flex-wrap:wrap;margin-top:7px;min-height:0}
+  .idx-changes .chg{display:inline-flex;align-items:center;gap:4px;padding:3px 7px;border-radius:999px;border:1px solid rgba(134,192,143,.25);background:rgba(134,192,143,.08);font-size:10px;font-weight:700;color:#b9dcbf}
+  .idx-changes .chg .icon{width:13px;height:13px;color:var(--green)}
+  .idx-changes .chg.neg{background:rgba(255,77,109,.08);border-color:rgba(255,77,109,.22);color:#ffb3c0}
+  .idx-changes .chg.neg .icon{color:#ffb3c0}
+  .idx-changes .ok{display:inline-flex;align-items:center;gap:4px;font-size:10px;color:var(--muted-2)}
+  .idx-changes .ok .icon{width:13px;height:13px;color:var(--green);opacity:.7}
+  .idx-head{display:flex;align-items:center;gap:8px}
+  .idx-head strong{font-size:12.5px;flex:1;min-width:0}
+  .idx-head .switch{width:42px;height:24px}
+  .idx-head .switch span::after{width:18px;height:18px}
+  .idx-head .switch input:checked + span::after{transform:translateX(18px)}
+  .stats{display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-top:9px}
+  .stat{display:flex;align-items:center;gap:7px;padding:6px 8px;border-radius:10px;background:rgba(255,255,255,.03);min-width:0}
+  .stat .icon{width:15px;height:15px;color:var(--cyan);flex:0 0 auto}
+  .stat b{display:block;font-size:12.5px;line-height:1.1;font-variant-numeric:tabular-nums;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .stat span{display:block;font-size:8.5px;color:var(--muted);margin-top:1px}
+  @media (min-width:980px){ .idx-cards{grid-template-columns:1fr 1fr} }
+  .mini{margin-top:9px;border-top:1px solid var(--line);padding-top:8px}
+  .mini summary{list-style:none;cursor:pointer;font-size:10.5px;color:var(--muted);display:flex;align-items:center;gap:6px}
+  .mini summary::-webkit-details-marker{display:none}
+  .mini summary::after{content:"";width:6px;height:6px;border-right:1.4px solid var(--muted);border-bottom:1.4px solid var(--muted);transform:rotate(45deg);margin-left:auto;transition:transform .2s}
+  .mini[open] summary::after{transform:rotate(-135deg)}
+
+  /* ---------- acordeones ---------- */
+  .acc{border:1px solid var(--line);border-radius:18px;background:var(--surface);margin-top:10px;overflow:hidden}
+  .acc summary{list-style:none;cursor:pointer;display:flex;align-items:center;gap:10px;padding:13px 14px;font-size:13px;font-weight:700}
+  .acc summary::-webkit-details-marker{display:none}
+  .acc summary::after{content:"";width:8px;height:8px;margin-left:auto;border-right:1.6px solid var(--muted);border-bottom:1.6px solid var(--muted);transform:rotate(45deg);transition:transform .2s}
+  .acc[open] summary::after{transform:rotate(-135deg)}
+  .acc summary .hint{margin-left:auto;font-weight:500}
+  .acc summary .hint + .acc-arrow{margin-left:0}
+  .acc-body{padding:0 12px 12px}
+  .acc[open] summary{border-bottom:1px solid var(--line);margin-bottom:10px}
+  .idx-grid{display:grid;grid-template-columns:1fr;gap:10px}
+  .provider{padding:10px 12px}
+  .provider-ico{width:32px;height:32px}
+  .provider-main strong{font-size:13px}
+  .provider-main span{font-size:10px}
+
+  #settingsForm{padding-bottom:78px}
+  .acc .acc-body .check:first-of-type{border-top:0}
+  .settings-save{position:sticky;bottom:calc(84px + env(safe-area-inset-bottom));z-index:6;display:flex;gap:8px;margin-top:12px;padding:8px;border-radius:16px;border:1px solid var(--line);background:rgba(12,9,7,.92);backdrop-filter:blur(14px);box-shadow:0 12px 34px rgba(0,0,0,.5)}
+  .settings-save .btn{flex:1}
+  @media (min-width:980px){.settings-save{bottom:14px}}
+
+  /* ---------- bottom nav ---------- */
+  .bottom-nav{position:fixed;left:12px;right:12px;bottom:calc(10px + env(safe-area-inset-bottom));z-index:60;display:flex;align-items:center;justify-content:space-around;gap:2px;height:66px;padding:6px;border-radius:22px;border:1px solid var(--line);background:rgba(10,10,16,.86);backdrop-filter:blur(24px) saturate(150%);box-shadow:0 20px 60px rgba(0,0,0,.65),inset 0 1px 0 rgba(255,255,255,.06)}
+  .bottom-nav button{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;flex:1;height:54px;border-radius:16px;color:var(--muted);font-size:9.5px;font-weight:650;transition:.15s}
+  .bottom-nav button.active{color:#fff;background:rgba(232,132,90,.14);box-shadow:inset 0 0 0 1px rgba(232,132,90,.20)}
+  .bottom-nav button.active .icon{filter:drop-shadow(0 0 8px rgba(232,132,90,.45))}
+
+  /* ---------- sheets / modal ---------- */
+  .sheet,.modal{position:fixed;inset:0;z-index:90;display:none;background:rgba(0,0,0,.72);backdrop-filter:blur(10px);padding:14px;overflow:auto}
+  .sheet.open,.modal.open{display:flex;align-items:flex-end;justify-content:center}
+  .sheet-panel,.modal-panel{width:100%;max-width:760px;max-height:88dvh;overflow:auto;border-radius:26px;border:1px solid var(--line);background:rgba(17,13,11,.98);box-shadow:0 30px 90px rgba(0,0,0,.8);padding:16px;animation:sheetIn .28s ease both}
+  @keyframes sheetIn{from{opacity:0;transform:translateY(24px)}to{opacity:1;transform:none}}
+  .sheet-head,.modal-head{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:14px}
+  .sheet-head h2,.modal-head h3{margin:0;font-size:17px;letter-spacing:-.02em}
+  .search-box{position:relative;margin-bottom:10px}
+  .search-box .icon{position:absolute;left:12px;top:50%;transform:translateY(-50%);color:var(--muted)}
+  .search-box input{padding-left:38px}
+  .search-results{display:flex;flex-direction:column;gap:8px;margin-top:12px}
+  .result{display:flex;gap:11px;align-items:center;padding:9px;border-radius:14px;border:1px solid var(--line);background:rgba(14,14,20,.7)}
+  .poster{width:46px;height:66px;border-radius:8px;object-fit:cover;background:#15151d;flex:0 0 auto}
+  .poster-ph{width:46px;height:66px;border-radius:8px;background:rgba(232,132,90,.16);display:grid;place-items:center;color:#fff;flex:0 0 auto}
+  .result-main{min-width:0;flex:1}
+  .result-main strong{display:block;font-size:12.5px;line-height:1.25;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .result-main span{display:block;font-size:10.5px;color:var(--muted);margin-top:3px}
+  .result-actions{display:flex;gap:5px;flex-wrap:wrap;justify-content:flex-end}
+  .modal-panel{max-width:440px;margin:auto}
+  .modal .field{margin-bottom:10px}
+  .modal-actions{display:flex;gap:8px;margin-top:14px}
+  .modal-actions .btn{flex:1}
+
+  /* ---------- gate ---------- */
+  .gate{position:fixed;inset:0;z-index:120;display:grid;place-items:center;padding:20px;background:radial-gradient(60% 50% at 50% 8%,rgba(232,132,90,.16),transparent 65%),#000}
+  .gate-card{width:100%;max-width:380px;padding:26px 20px;border-radius:26px;border:1px solid var(--line);background:rgba(14,14,20,.82);backdrop-filter:blur(24px);box-shadow:var(--shadow);text-align:center}
+  .gate-logo{width:92px;height:92px;margin:0 auto 8px;filter:drop-shadow(0 0 34px rgba(232,132,90,.45))}
+  .gate-logo img{width:100%;height:100%;object-fit:contain}
+  .gate h1{margin:0;font-size:24px;letter-spacing:-.03em}
+  .gate p{font-size:12px;color:var(--muted);line-height:1.5}
+  .gate .field{text-align:left;margin:16px 0 12px}
+  .gate .btn{width:100%}
+  .error{color:#ffb3c0;font-size:11px;min-height:16px;margin:8px 0 0}
+
+  /* ---------- toast ---------- */
+  .toast{position:fixed;left:50%;bottom:calc(88px + env(safe-area-inset-bottom));transform:translate(-50%,18px);z-index:140;max-width:92vw;padding:11px 14px;border-radius:14px;border:1px solid var(--line);background:rgba(18,18,26,.94);backdrop-filter:blur(18px);box-shadow:0 18px 50px rgba(0,0,0,.6);font-size:12px;opacity:0;pointer-events:none;transition:.22s}
+  .toast.show{opacity:1;transform:translate(-50%,0)}
+  .toast.error{border-color:rgba(255,77,109,.3);color:#ffb3c0}
+  .toast.ok{border-color:rgba(34,255,167,.22);color:#b9ffe2}
+
+  /* ---------- responsive ---------- */
+  @media (max-width:759px){
+    .result{flex-wrap:wrap}
+    .result-main{flex:1 1 calc(100% - 57px)}
+    .result-main strong{white-space:normal}
+    .result-actions{flex:1 0 100%;justify-content:flex-end}
+  }
+  @media (min-width:760px){
+    .app{padding:0 22px 70px}
+    .kpi-grid{grid-template-columns:repeat(4,minmax(0,1fr));gap:12px}
+    .provider-grid{grid-template-columns:repeat(2,1fr)}
+    .bridge-grid{grid-template-columns:repeat(2,1fr)}
+    .settings-grid{grid-template-columns:repeat(2,1fr)}
+    .form-grid{grid-template-columns:repeat(2,1fr)}
+    .cache-card{grid-template-columns:auto minmax(0,1fr) auto;align-items:center}
+    .cache-actions{grid-column:auto;margin-top:0;justify-content:flex-end;min-width:230px}
+    .cache-actions .btn{flex:0 0 auto}
+    .sheet.open,.modal.open{align-items:center}
+    .sheet-panel{max-height:86dvh}
+  }
+  @media (min-width:980px){
+    #view-inicio{display:grid;grid-template-columns:minmax(0,1.05fr) minmax(0,.95fr);gap:16px;align-items:start}
+    #view-inicio .statusband{grid-column:1}
+    #view-inicio .kpi-grid{grid-column:1;max-width:none}
+    #view-inicio .section-head{grid-column:2;grid-row:1;margin:0}
+    #view-inicio #homeActivity{grid-column:2;grid-row:2 / span 2}
+    .top-tabs{display:flex}
+    .bottom-nav{display:none}
+    .app{padding-bottom:30px}
+  }
+  @media (prefers-reduced-motion:reduce){
+    *,*::before,*::after{animation-duration:.001ms!important;animation-iteration-count:1!important;transition-duration:.001ms!important;scroll-behavior:auto!important}
+  }
+  /* ---------- aureola cálida ---------- */
+  body::before{content:"";position:fixed;left:50%;top:-18vh;width:130vw;height:70vh;transform:translateX(-50%);background:radial-gradient(closest-side,rgba(232,132,90,.10),transparent 72%);pointer-events:none;z-index:0}
+  .app{position:relative;z-index:1}
+  ::selection{background:rgba(232,132,90,.30)}
+  html{color-scheme:dark}
+  .quick-ico .icon,.row-ico .icon,.cache-ico .icon{width:24px;height:24px}
+  .kpi-ico .icon{width:19px;height:19px}
+  /* La barra tapa el contenido al hacer scroll: fondo sólido para que no se
+     vea el título cortado por detrás. */
+  @media (max-width:719px){
+    .topbar{background:rgba(9,7,6,.62);backdrop-filter:blur(20px) saturate(140%);-webkit-backdrop-filter:blur(20px) saturate(140%);border-bottom:1px solid rgba(255,255,255,.06)}
+  }
+  /* ---------- demo ---------- */
+  #demoDado{position:fixed;left:14px;bottom:calc(92px + env(safe-area-inset-bottom));z-index:70;width:46px;height:46px;border-radius:50%;border:1px solid var(--line);background:rgba(20,15,12,.94);font-size:21px;line-height:1;display:grid;place-items:center;box-shadow:0 12px 30px rgba(0,0,0,.55);backdrop-filter:blur(14px)}
+  #demoDado:active{transform:scale(.94)}
+  @media (min-width:980px){#demoDado{bottom:22px}}
+</style>
+</head>
+<body>
+
+<!-- icon sprite -->
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <defs>
+    <linearGradient id="gv" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#f0a45e"/><stop offset="1" stop-color="#e8845a"/></linearGradient>
+    <linearGradient id="gg" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#86c08f"/><stop offset="1" stop-color="#f0a45e"/></linearGradient>
+    <linearGradient id="ga" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#ffb020"/><stop offset="1" stop-color="#ff4d6d"/></linearGradient>
+  </defs>
+  <symbol id="i-home" viewBox="0 0 24 24"><path d="M3 10.5 12 3l9 7.5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/><path d="M5.5 9.5V21h13V9.5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+  <symbol id="i-play" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9" fill="none" stroke="currentColor" stroke-width="1.8"/><path d="m10 8.5 5 3.5-5 3.5z" fill="currentColor"/></symbol>
+  <symbol id="i-cache" viewBox="0 0 24 24"><ellipse cx="12" cy="5.5" rx="7.5" ry="3" fill="none" stroke="currentColor" stroke-width="1.7"/><path d="M4.5 5.5v6c0 1.7 3.4 3 7.5 3s7.5-1.3 7.5-3v-6" fill="none" stroke="currentColor" stroke-width="1.7"/><path d="M4.5 11.5v6c0 1.7 3.4 3 7.5 3s7.5-1.3 7.5-3v-6" fill="none" stroke="currentColor" stroke-width="1.7"/></symbol>
+  <symbol id="i-layers" viewBox="0 0 24 24"><path d="m12 3 9 5-9 5-9-5 9-5Z" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round"/><path d="m3 12 9 5 9-5M3 16l9 5 9-5" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round"/></symbol>
+  <symbol id="i-settings" viewBox="0 0 24 24"><circle cx="12" cy="12" r="3.2" fill="none" stroke="currentColor" stroke-width="1.7"/><path d="M19.4 15a1.7 1.7 0 0 0 .34 1.88l.06.06-2.12 2.12-.06-.06a1.7 1.7 0 0 0-1.88-.34 1.7 1.7 0 0 0-1 1.56V20h-3v-.09a1.7 1.7 0 0 0-1-1.56 1.7 1.7 0 0 0-1.88.34l-.06.06-2.12-2.12.06-.06A1.7 1.7 0 0 0 7.6 15a1.7 1.7 0 0 0-1.56-1H6v-3h.09A1.7 1.7 0 0 0 7.6 10a1.7 1.7 0 0 0-.34-1.88l-.06-.06 2.12-2.12.06.06A1.7 1.7 0 0 0 11.26 6a1.7 1.7 0 0 0 1-1.56V4h3v.09a1.7 1.7 0 0 0 1 1.56 1.7 1.7 0 0 0 1.88-.34l.06-.06 2.12 2.12-.06.06A1.7 1.7 0 0 0 19.4 10a1.7 1.7 0 0 0 1.56 1H21v3h-.09a1.7 1.7 0 0 0-1.51 1Z" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+  <symbol id="i-search" viewBox="0 0 24 24"><circle cx="11" cy="11" r="6.5" fill="none" stroke="currentColor" stroke-width="1.8"/><path d="m16 16 4.5 4.5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></symbol>
+  <symbol id="i-refresh" viewBox="0 0 24 24"><path d="M20 12a8 8 0 1 1-2.3-5.6" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/><path d="M20 4v5h-5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+  <symbol id="i-movie" viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="14" rx="2.5" fill="none" stroke="currentColor" stroke-width="1.7"/><path d="M3 9h18M8 5l2 4M14 5l2 4" fill="none" stroke="currentColor" stroke-width="1.5"/><path d="m10.5 11.5 3.5 2-3.5 2z" fill="currentColor"/></symbol>
+  <symbol id="i-series" viewBox="0 0 24 24"><rect x="3" y="6" width="18" height="13" rx="2.5" fill="none" stroke="currentColor" stroke-width="1.7"/><path d="M8 3l4 3 4-3" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/><path d="M8 11h5M8 14.5h3" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/><path d="m15 11.5 2.5 1.5-2.5 1.5z" fill="currentColor"/></symbol>
+  <symbol id="i-bridge" viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="12" rx="2" fill="none" stroke="currentColor" stroke-width="1.7"/><path d="M8 21h8M12 17v4" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/><path d="M7 10h3M14 10h3M7 13h10" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></symbol>
+  <symbol id="i-trash" viewBox="0 0 24 24"><path d="M4 7h16M9 7V4h6v3M7 7l1 13h8l1-13" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/><path d="M10 11v5M14 11v5" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></symbol>
+  <symbol id="i-clock" viewBox="0 0 24 24"><circle cx="12" cy="12" r="8.5" fill="none" stroke="currentColor" stroke-width="1.7"/><path d="M12 7.5V12l3 2" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+  <symbol id="i-calendar" viewBox="0 0 24 24"><rect x="3.5" y="5" width="17" height="15" rx="2.5" fill="none" stroke="currentColor" stroke-width="1.7"/><path d="M3.5 9h17M8 3.5V6M16 3.5V6" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/></symbol>
+  <symbol id="i-pulse" viewBox="0 0 24 24"><path d="M3 12h3.2l2.4 6L12 5l3.2 7H21" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+  <symbol id="i-database" viewBox="0 0 24 24"><ellipse cx="12" cy="5.5" rx="7.5" ry="3" fill="none" stroke="currentColor" stroke-width="1.7"/><path d="M4.5 5.5v13c0 1.7 3.4 3 7.5 3s7.5-1.3 7.5-3v-13" fill="none" stroke="currentColor" stroke-width="1.7"/><path d="M4.5 12c0 1.7 3.4 3 7.5 3s7.5-1.3 7.5-3" fill="none" stroke="currentColor" stroke-width="1.7"/></symbol>
+  <symbol id="i-archive" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="4.8" rx="1.3" fill="none" stroke="currentColor" stroke-width="1.7"/><path d="M5 8.8V19a1.4 1.4 0 0 0 1.4 1.4h11.2A1.4 1.4 0 0 0 19 19V8.8" fill="none" stroke="currentColor" stroke-width="1.7"/><path d="M10 12.2h4" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/></symbol>
+  <symbol id="i-globe" viewBox="0 0 24 24"><circle cx="12" cy="12" r="8.5" fill="none" stroke="currentColor" stroke-width="1.7"/><path d="M3.5 12h17M12 3.5c2.4 2.4 3.6 5.3 3.6 8.5S14.4 18.1 12 20.5c-2.4-2.4-3.6-5.3-3.6-8.5S9.6 5.9 12 3.5Z" fill="none" stroke="currentColor" stroke-width="1.6"/></symbol>
+  <symbol id="i-plus" viewBox="0 0 24 24"><path d="M12 5v14M5 12h14" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></symbol>
+  <symbol id="i-check" viewBox="0 0 24 24"><path d="m5 12.5 4.5 4.5L19 7" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+  <symbol id="i-x" viewBox="0 0 24 24"><path d="M6 6l12 12M18 6 6 18" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round"/></symbol>
+  <symbol id="i-arrow" viewBox="0 0 24 24"><path d="m9 5 7 7-7 7" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+  <symbol id="i-cloud" viewBox="0 0 24 24"><path d="M7 18h10a3.5 3.5 0 0 0 .3-7A5.5 5.5 0 0 0 6.6 10 4 4 0 0 0 7 18Z" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round"/></symbol>
+</svg>
+
+<!-- gate -->
+<div class="gate" id="gate" hidden>
+  <div class="gate-card">
+    <div class="gate-logo"><img src="data:image/webp;base64,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" alt="Central"></div>
+    <h1>Central Admin</h1>
+    <p>Control del addon, la caché y el puente.</p>
+    <form id="gateForm">
+      <div class="field">
+        <label for="gateToken">Token de administrador</label>
+        <input id="gateToken" type="password" placeholder="ADMIN_TOKEN" autocomplete="off" spellcheck="false">
+      </div>
+      <button class="btn primary" type="submit">Entrar</button>
+      <p class="error" id="gateError"></p>
+    </form>
+  </div>
+</div>
+
+<!-- app -->
+<div class="app" id="app" hidden>
+  <header class="topbar">
+    <div class="brand">
+      <div class="brand-mark"><img src="data:image/webp;base64,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" alt="Central"></div>
+      <div><strong>Central Admin</strong><span>demo · datos simulados</span></div>
+    </div>
+    <div class="top-actions">
+      <button class="icon-btn" id="btnSearch" aria-label="Buscar título"><svg class="icon"><use href="#i-search"></use></svg></button>
+      <button class="icon-btn" id="btnRefresh" aria-label="Actualizar"><svg class="icon icon-sm"><use href="#i-refresh"></use></svg></button>
+    </div>
+  </header>
+
+  <nav class="top-tabs" id="topTabs">
+    <button data-view="inicio" class="active">Inicio</button>
+    <button data-view="ahora">Ahora</button>
+    <button data-view="cache">Caché</button>
+    <button data-view="fuentes">Fuentes</button>
+    <button data-view="propios">Capa 0</button>
+    <button data-view="ajustes">Ajustes</button>
+  </nav>
+
+  <main>
+    <!-- INICIO -->
+    <section class="view active" id="view-inicio">
+      <div class="statusband">
+        <div class="statusband-top">
+          <span class="eyebrow" style="margin:0">Estado</span>
+          <div class="hero-pill" id="heroBridgePill"><span class="dot" id="heroBridgeDot"></span><span id="heroBridgeText">Leyendo estado…</span></div>
+        </div>
+        <div class="status-strip" id="statusStrip"></div>
+      </div>
+
+      <div class="kpi-grid compact">
+        <article class="kpi">
+          <div class="kpi-top"><span class="kpi-ico"><svg class="icon icon-sm"><use href="#i-movie"></use></svg></span><span class="kpi-label">Títulos</span></div>
+          <div class="kpi-value" id="kpiTitulos">—</div>
+          <div class="kpi-sub" id="kpiTitulosSub">indexados</div>
+        </article>
+        <article class="kpi">
+          <div class="kpi-top"><span class="kpi-ico"><svg class="icon icon-sm"><use href="#i-database"></use></svg></span><span class="kpi-label">En caché</span></div>
+          <div class="kpi-value" id="kpiCache">—</div>
+          <div class="kpi-sub" id="kpiCacheSub">listas</div>
+        </article>
+        <article class="kpi">
+          <div class="kpi-top"><span class="kpi-ico"><svg class="icon icon-sm"><use href="#i-layers"></use></svg></span><span class="kpi-label">Fuentes</span></div>
+          <div class="kpi-value" id="kpiFuentes">—</div>
+          <div class="kpi-sub" id="kpiFuentesSub">activas</div>
+        </article>
+        <article class="kpi">
+          <div class="kpi-top"><span class="kpi-ico"><svg class="icon icon-sm"><use href="#i-pulse"></use></svg></span><span class="kpi-label">Hora</span></div>
+          <div class="kpi-value" id="kpiPeticiones">—</div>
+          <div class="kpi-sub" id="kpiPeticionesSub">peticiones</div>
+        </article>
+      </div>
+
+      <div class="section-head small">
+        <div><p class="eyebrow">Ahora</p><h2>Últimas actividades</h2></div>
+        <button class="btn sm" data-go="ahora">Ver todo</button>
+      </div>
+      <div class="list" id="homeActivity"></div>
+
+    </section>
+
+    <!-- AHORA -->
+    <section class="view" id="view-ahora">
+      <div class="section-head">
+        <div><p class="eyebrow">Actividad</p><h2>Últimas actividades</h2></div>
+        <span class="hint" id="activityHint">—</span>
+      </div>
+      <div class="row" id="prefetchCard" style="margin-bottom:12px"></div>
+      <div class="segmented" id="activityTabs">
+        <button data-tab="live" class="active">En vivo · 10 min</button>
+        <button data-tab="historial">Historial · 5 días</button>
+      </div>
+      <div class="list" id="activityLive" style="margin-top:12px"></div>
+      <div class="list" id="activityHistory" style="margin-top:12px" hidden></div>
+    </section>
+
+    <!-- CACHE -->
+    <section class="view" id="view-cache">
+      <div class="section-head">
+        <div><p class="eyebrow">Memoria</p><h2>Caché de reproducción</h2></div>
+        <span class="hint" id="cacheHint">—</span>
+      </div>
+      <div class="toolbar">
+        <input id="cacheFilter" type="search" placeholder="Filtrar por título…" autocomplete="off">
+        <select id="cacheType">
+          <option value="all">Todo</option>
+          <option value="movie">Películas</option>
+          <option value="series">Series</option>
+        </select>
+      </div>
+      <div class="cache-list" id="cacheList"></div>
+    </section>
+
+    <!-- FUENTES -->
+    <section class="view" id="view-fuentes">
+      <div class="section-head">
+        <div><p class="eyebrow">Cascada</p><h2>Fuentes por tier</h2></div>
+        <span class="hint">se aplican al instante</span>
+      </div>
+
+      <div class="cascade" id="fuentesCascade">
+        <section class="tier">
+          <div class="tier-card">
+            <div class="tier-head">
+              <span class="tier-tag t0">T0</span>
+              <div class="tier-title"><strong>Propios</strong><span id="t0Summary">—</span></div>
+              <label class="switch" aria-label="Activar Propios"><input type="checkbox" data-provider="propios"><span></span></label>
+            </div>
+            <div class="tier-body">
+              <div class="storage">
+                <div class="storage-row">
+                  <div class="storage-item">
+                    <div class="storage-line">
+                      <span class="stat-ico"><svg class="icon icon-sm"><use href="#i-database"></use></svg></span>
+                      <strong id="b2Usado">—</strong>
+                    </div>
+                    <span class="storage-label">ocupado</span>
+                  </div>
+                  <div class="storage-item right">
+                    <div class="storage-line">
+                      <span class="stat-ico free"><svg class="icon icon-sm"><use href="#i-cloud"></use></svg></span>
+                      <strong id="b2Libre">—</strong>
+                    </div>
+                    <span class="storage-label">disponible</span>
+                  </div>
+                </div>
+                <div class="bar"><i id="b2Bar"></i></div>
+                <p class="hint" id="b2Detalle">Leyendo…</p>
+
+              </div>
+              <button class="btn sm" id="btnOpenPropios" style="width:100%;margin-top:8px">Gestionar Backblaze</button>
+            </div>
+          </div>
+        </section>
+
+        <section class="tier">
+          <div class="tier-card">
+            <div class="tier-head">
+              <span class="tier-tag t1">T1</span>
+              <div class="tier-title"><strong>Índices</strong><span id="t1Summary">—</span></div>
+            </div>
+            <div class="tier-body">
+              <div class="idx-cards">
+                <article class="idx-card">
+                  <div class="idx-head">
+                    <span class="provider-ico v" style="width:30px;height:30px"><svg class="icon icon-sm"><use href="#i-layers"></use></svg></span>
+                    <strong>Yandex</strong>
+                    <span class="badge g" id="yandexBadge">—</span>
+                    <label class="switch" aria-label="Activar Yandex"><input type="checkbox" data-provider="yandex"><span></span></label>
+                  </div>
+                  <div class="stats">
+                    <div class="stat"><svg class="icon icon-sm"><use href="#i-series"></use></svg><div><b id="ySeries">—</b><span>series</span></div></div>
+                    <div class="stat"><svg class="icon icon-sm"><use href="#i-play"></use></svg><div><b id="yEps">—</b><span>episodios</span></div></div>
+                    <div class="stat"><svg class="icon icon-sm"><use href="#i-movie"></use></svg><div><b id="yPelis">—</b><span>películas</span></div></div>
+                    <div class="stat"><svg class="icon icon-sm"><use href="#i-layers"></use></svg><div><b id="yVar">—</b><span>variantes</span></div></div>
+                  </div>
+                  <div class="idx-meta" id="yMeta">
+                    <span class="meta-item" id="yUltima" title="Última corrida"><svg class="icon icon-sm"><use href="#i-clock"></use></svg><span>—</span></span>
+                    <span class="meta-item" id="yProxima" title="Próxima actualización automática"><svg class="icon icon-sm"><use href="#i-calendar"></use></svg><span>—</span></span>
+                  </div>
+                  <div class="idx-changes" id="yCambios"></div>
+                  <button class="btn sm" id="btnRefreshYandex" style="width:100%;margin-top:9px"><svg class="icon icon-sm"><use href="#i-refresh"></use></svg> Actualizar índice</button>
+                  <details class="mini">
+                    <summary>Historial de corridas</summary>
+                    <div class="list" id="refreshHistory" style="margin-top:8px"></div>
+                    <div class="list" id="refreshLogs" style="margin-top:8px"></div>
+                  </details>
+                </article>
+
+                <article class="idx-card">
+                  <div class="idx-head">
+                    <span class="provider-ico c" style="width:30px;height:30px"><svg class="icon icon-sm"><use href="#i-database"></use></svg></span>
+                    <strong>Xuper</strong>
+                    <span class="badge g" id="xuperIdxBadge">—</span>
+                    <label class="switch" aria-label="Activar Xuper Idx"><input type="checkbox" data-provider="xuperIdx"><span></span></label>
+                  </div>
+                  <div class="stats">
+                    <div class="stat"><svg class="icon icon-sm"><use href="#i-series"></use></svg><div><b id="xSeries">—</b><span>series</span></div></div>
+                    <div class="stat"><svg class="icon icon-sm"><use href="#i-play"></use></svg><div><b id="xEps">—</b><span>episodios</span></div></div>
+                    <div class="stat"><svg class="icon icon-sm"><use href="#i-movie"></use></svg><div><b id="xPelis">—</b><span>películas</span></div></div>
+                    <div class="stat"><svg class="icon icon-sm"><use href="#i-globe"></use></svg><div><b id="xHosts">—</b><span>hosts</span></div></div>
+                  </div>
+                </article>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <section class="tier">
+          <div class="tier-card">
+            <div class="tier-head">
+              <span class="tier-tag t2">T2</span>
+              <div class="tier-title"><strong>En vivo</strong><span id="t2Summary">—</span></div>
+            </div>
+            <div class="tier-body">
+              <div class="provider-grid" id="provGridT2"></div>
+              <div class="settings-card" id="xuperLiveCard" style="margin-top:10px">
+                <div class="bridge-head">
+                  <div class="bridge-name">
+                    <span class="provider-ico c" style="width:32px;height:32px"><svg class="icon icon-sm"><use href="#i-pulse"></use></svg></span>
+                    Xuper en vivo
+                  </div>
+                  <span class="badge r" id="xuperLiveBadge">—</span>
+                </div>
+                <div class="chips" id="xuperLiveChips" style="margin-top:8px"></div>
+                <p class="hint" id="xuperLiveDetail" style="margin:8px 0 0">Consultando…</p>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <section class="tier">
+          <div class="tier-card">
+            <div class="tier-head">
+              <span class="tier-tag t3">T3</span>
+              <div class="tier-title"><strong>Web y puentes</strong><span id="t3Summary">—</span></div>
+            </div>
+            <div class="tier-body">
+              <div class="provider-grid" id="provGridT3"></div>
+            </div>
+          </div>
+        </section>
+      </div>
+
+      <details class="acc">
+        <summary><span>Salud técnica</span><span class="hint" id="saludSummary">—</span></summary>
+        <div class="acc-body">
+          <div class="settings-card" id="seedsCard">
+            <div class="bridge-head">
+              <div class="bridge-name">
+                <span class="provider-ico c" style="width:32px;height:32px"><svg class="icon icon-sm"><use href="#i-database"></use></svg></span>
+                Semillas de Xuper
+              </div>
+              <span class="badge m" id="seedsMode">—</span>
+            </div>
+            <div class="chips" id="seedsChips" style="margin-top:8px"></div>
+            <p class="hint" id="seedsDetail" style="margin:8px 0 0">Consultando…</p>
+          </div>
+
+          <div class="settings-card" id="routesCard" style="margin-top:10px">
+            <div class="bridge-head">
+              <div class="bridge-name">
+                <span class="provider-ico v" style="width:32px;height:32px"><svg class="icon icon-sm"><use href="#i-globe"></use></svg></span>
+                Rutas e IP de proveedores
+              </div>
+            </div>
+            <div class="list" id="routesList" style="margin-top:8px"></div>
+          </div>
+
+          <div class="section-head small">
+            <div><p class="eyebrow">Puente</p><h2>Deno · video con IP atada</h2></div>
+            <button class="btn sm" id="btnBridgeTest"><svg class="icon icon-sm"><use href="#i-refresh"></use></svg> Probar</button>
+          </div>
+          <div class="bridge-grid" id="bridgeCards"></div>
+        </div>
+      </details>
+    </section>
+
+    <!-- CAPA 0 -->
+    <section class="view" id="view-propios">
+      <div class="section-head">
+        <div><p class="eyebrow">Capa 0</p><h2>Contenido propio</h2></div>
+        <span class="hint" id="propiosMeta">—</span>
+      </div>
+      <p class="hint" style="margin:0 2px 14px">Archivos alojados en Backblaze. Se sirven antes que cualquier proveedor, directo desde el bucket.</p>
+      <div class="list" id="propiosList"></div>
+      <div class="empty" id="propiosEmpty" hidden><strong>Sin contenido propio</strong>El catálogo está vacío o faltan credenciales de B2.</div>
+    </section>
+
+    <section class="view" id="view-ajustes">
+      <div class="section-head">
+        <div><p class="eyebrow">Configuración</p><h2>Ajustes</h2></div>
+        <span class="hint">sin reiniciar</span>
+      </div>
+      <form id="settingsForm">
+        <details class="acc" open>
+          <summary><span>Caché y ventana</span></summary>
+          <div class="acc-body">
+            <div class="form-grid">
+              <div class="field"><label for="setTtl">Días de caché Yandex</label><input id="setTtl" type="number" min="0.25" max="7" step="0.25"></div>
+              <div class="field"><label for="setManualD">Días manuales</label><input id="setManualD" type="number" min="0.25" max="30" step="0.25"></div>
+              <div class="field"><label for="setActivity">Días de historial</label><input id="setActivity" type="number" min="1" max="30" step="1"></div>
+              <div class="field"><label for="setMax">Series en ventana</label><input id="setMax" type="number" min="1" max="30" step="1"></div>
+              <div class="field"><label for="setIdle">Días de inactividad</label><input id="setIdle" type="number" min="1" max="30" step="1"></div>
+              <div class="field"><label for="setLive">Segmentos de TV</label><select id="setLive"><option value="direct">Directo</option><option value="proxy">Proxy</option></select></div>
+            </div>
+          </div>
+        </details>
+
+        <details class="acc">
+          <summary><span>Precarga por fuente</span></summary>
+          <div class="acc-body">
+            <div class="form-grid">
+              <div class="field"><label for="setYandexPre">Horas Yandex</label><input id="setYandexPre" type="number" min="0.25" max="72" step="0.25"></div>
+              <div class="field"><label for="setXuperH">Horas Xuper</label><input id="setXuperH" type="number" min="0.25" max="4" step="0.25"></div>
+              <div class="field"><label for="setGnulaH">Horas Gnula</label><input id="setGnulaH" type="number" min="0.25" max="8" step="0.25"></div>
+              <div class="field"><label for="setKawaiiH">Horas Kawaii</label><input id="setKawaiiH" type="number" min="0.25" max="8" step="0.25"></div>
+              <div class="field"><label for="setWebH">Horas Web</label><input id="setWebH" type="number" min="0.25" max="8" step="0.25"></div>
+            </div>
+            <label class="check"><span>Precargar al abrir<small>Guarda el siguiente capítulo al pedir uno.</small></span><input id="setPrefetch" type="checkbox"></label>
+            <label class="check"><span>Resplandor del encabezado<small>El brillo cálido de la franja de estado. Apágalo si va lento.</small></span><input id="setHero" type="checkbox"></label>
+            <label class="check"><span>Búsqueda completa<small>Consulta también Xuper, Gnula, Kawaii y los scrapers aunque ya haya una fuente.</small></span><input id="setCompleta" type="checkbox"></label>
+            <label class="check"><span>Tier 2 en paralelo<small>Las fuentes de respaldo salen al mismo tiempo que Yandex.</small></span><input id="setParalelo" type="checkbox"></label>
+            <label class="check"><span>Puntaje del Tier 2<small>Ordena por idioma, calidad y estabilidad del servidor.</small></span><input id="setPuntaje" type="checkbox"></label>
+          </div>
+        </details>
+
+        <details class="acc">
+          <summary><span>Reproducción</span></summary>
+          <div class="acc-body">
+            <label class="check"><span>Entregar video directo (302)<small>Menos carga en Render; el reproductor va al CDN.</small></span><input id="setDirect" type="checkbox"></label>
+            <label class="check"><span>Entregar enlaces sin confirmar<small>Más opciones, con riesgo de algún enlace caído.</small></span><input id="setUnknown" type="checkbox"></label>
+            <label class="check"><span>Xuper directo<small>Entrega el enlace de Xuper sin pasar por Render.</small></span><input id="setXuper" type="checkbox"></label>
+            <label class="check"><span>Cuenta compartida de Xuper<small>Usa la cuenta que trae el plugin.</small></span><input id="setXuperShared" type="checkbox"></label>
+          </div>
+        </details>
+
+        <div class="settings-save">
+          <button class="btn primary" type="submit"><svg class="icon icon-sm"><use href="#i-check"></use></svg> Guardar ajustes</button>
+          <button class="btn" type="button" id="btnReset">Valores por defecto</button>
+        </div>
+      </form>
+
+      <div class="danger-zone">
+        <h3>Zona peligrosa</h3>
+        <button class="btn danger sm" id="btnClearCache"><svg class="icon icon-sm"><use href="#i-trash"></use></svg> Vaciar toda la caché</button>
+        <button class="btn danger sm" id="btnClearActivity"><svg class="icon icon-sm"><use href="#i-trash"></use></svg> Borrar historial</button>
+        <button class="btn ghost sm" id="btnLogout">Salir</button>
+      </div>
+    </section>
+  </main>
+
+  <nav class="bottom-nav" id="bottomNav">
+    <button data-view="inicio" class="active"><svg class="icon"><use href="#i-home"></use></svg><span>Inicio</span></button>
+    <button data-view="ahora"><svg class="icon"><use href="#i-pulse"></use></svg><span>Ahora</span></button>
+    <button data-view="cache"><svg class="icon"><use href="#i-database"></use></svg><span>Caché</span></button>
+    <button data-view="fuentes"><svg class="icon"><use href="#i-layers"></use></svg><span>Fuentes</span></button>
+    <button data-view="ajustes"><svg class="icon"><use href="#i-settings"></use></svg><span>Ajustes</span></button>
+  </nav>
+</div>
+
+<!-- search sheet -->
+<div class="sheet" id="searchSheet">
+  <div class="sheet-panel">
+    <div class="sheet-head">
+      <h2>Buscar título</h2>
+      <button class="icon-btn" id="closeSearch" aria-label="Cerrar"><svg class="icon icon-sm"><use href="#i-x"></use></svg></button>
+    </div>
+    <div class="search-box">
+      <svg class="icon icon-sm"><use href="#i-search"></use></svg>
+      <input id="searchInput" type="search" placeholder="Película o serie…" autocomplete="off">
+    </div>
+    <div class="segmented" id="searchType">
+      <button data-type="movie" class="active">Películas</button>
+      <button data-type="series">Series</button>
+    </div>
+    <div class="search-results" id="searchResults"></div>
+  </div>
+</div>
+
+<!-- hoja de episodios propios -->
+<div class="sheet" id="propiosSheet">
+  <div class="sheet-panel">
+    <div class="sheet-head">
+      <h2 id="propiosSheetTitle">—</h2>
+      <button class="icon-btn" id="closePropiosSheet" aria-label="Cerrar"><svg class="icon icon-sm"><use href="#i-x"></use></svg></button>
+    </div>
+    <div class="search-box">
+      <svg class="icon icon-sm"><use href="#i-search"></use></svg>
+      <input id="propiosEpFilter" type="search" placeholder="Filtrar episodio (T1E2)…" autocomplete="off">
+    </div>
+    <div class="list" id="propiosSheetBody"></div>
+  </div>
+</div>
+
+<!-- modal -->
+<div class="modal" id="modal">
+  <div class="modal-panel">
+    <div class="modal-head">
+      <h3 id="modalTitle">—</h3>
+      <button class="icon-btn" id="modalClose" aria-label="Cerrar"><svg class="icon icon-sm"><use href="#i-x"></use></svg></button>
+    </div>
+    <div id="modalBody"></div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+(() => {
+  const $ = (s, r = document) => r.querySelector(s);
+  const $$ = (s, r = document) => Array.from(r.querySelectorAll(s));
+  const nf = new Intl.NumberFormat('es-CO');
+  const state = {
+    data: null,
+    activity: [],
+    history: [],
+    historySummary: null,
+    bridge: null,
+    refresh: null,
+    refreshTimer: null,
+    cacheGroups: new Map(),
+    cacheFilter: '',
+    cacheType: 'all',
+    activityTab: 'live',
+    searchType: 'movie',
+    searchMetas: new Map(),
+    searchTimer: null,
+    settingsDirty: false,
+    ttlAbiertos: new Set(),
+    view: 'inicio',
+    overlay: null,
+    dirty: {},
+    propios: [],
+    propiosAbierto: null,
+    cacheShown: 20,
+    timer: null
+  };
+
+  function fmt(n) { return nf.format(Number(n) || 0); }
+  function esc(s) {
+    return String(s == null ? '' : s).replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+  }
+  function attr(s) { return esc(s).replace(/`/g, '&#96;'); }
+  function cap(s) { return String(s || '').replace(/^./, (c) => c.toUpperCase()); }
+
+  // =============================================================
+  // MODO DEMO: datos simulados en memoria. Sin servidor, sin token.
+  // =============================================================
+  let DEMO = null;
+  const demoRnd = (a, b) => Math.floor(Math.random() * (b - a + 1)) + a;
+  const demoPick = (a) => a[Math.floor(Math.random() * a.length)];
+  const demoHace = (h) => Date.now() - h * 3600000;
+  const demoHoy = () => new Date().toISOString().slice(0, 10);
+
+  function generarDemo() {
+    const ahora = Date.now();
+    const pelis = [
+      ['tt7526136', 'El corazón de la bestia', 2026],
+      ['tt0114709', 'Toy Story', 1995],
+      ['tt1375666', 'El Origen', 2010],
+      ['tt33764258', 'La Odisea', 2026],
+      ['tt0068646', 'El Padrino', 1972],
+      ['tt0133093', 'Matrix', 1999]
+    ];
+    const series = [
+      ['tt0903747', 'Breaking Bad', 1, 4],
+      ['tt0386676', 'La Oficina', 2, 3],
+      ['tt4574334', 'Stranger Things', 4, 1],
+      ['tt6468322', 'La Casa de Papel', 3, 2],
+      ['tt11280740', 'Severance', 2, 1]
+    ];
+    const fuentes = ['Yandex', 'Xuper Idx', 'Propios', 'Kawaii', 'Fanpelis'];
+
+    const actividad = [];
+    for (let i = 0; i < 40; i++) {
+      const esSerie = Math.random() < 0.45;
+      const t = esSerie ? demoPick(series) : demoPick(pelis);
+      const usadas = [demoPick(fuentes), demoPick(fuentes)].filter((v, k, a) => a.indexOf(v) === k);
+      actividad.push({
+        ts: demoHace(Math.random() * 30),
+        type: esSerie ? 'series' : 'movie',
+        id: t[0],
+        title: esSerie ? t[1] + ' T' + demoRnd(1, 4) + 'E' + demoRnd(1, 10) : t[1] + ' (' + t[2] + ')',
+        tier: 'tier1',
+        ms: demoRnd(180, 4200),
+        streams: demoRnd(1, 9),
+        sources: usadas
+      });
+    }
+    actividad.sort((a, b) => b.ts - a.ts);
+
+    const cacheEntries = [];
+    for (let i = 0; i < 150; i++) {
+      const esSerie = Math.random() < 0.5;
+      const t = esSerie ? demoPick(series) : demoPick(pelis);
+      const s = demoRnd(1, 4);
+      const e = demoRnd(1, 10);
+      cacheEntries.push({
+        key: esSerie ? 'series:' + t[0] + ':' + s + ':' + e : 'movie:' + t[0],
+        count: demoRnd(1, 6),
+        ttlLeftMs: demoRnd(1, 120) * 3600000,
+        manual: Math.random() < 0.2,
+        prefetch: Math.random() < 0.3,
+        sample: (esSerie ? t[1] : t[1] + ' (' + t[2] + ')') + '\n1080p · ' + demoRnd(2, 9) + ',' + demoRnd(1, 9) + ' GB · ' + demoPick(['Latino', 'Dual', 'Castellano'])
+      });
+    }
+
+    const eps = [];
+    for (let t = 1; t <= 4; t++) {
+      const cuantos = t === 1 ? 10 : 8;
+      for (let e = 1; e <= cuantos; e++) {
+        eps.push({ t: t, e: e, ruta: 'demo/T' + t + 'E' + e + '.mp4', size: demoRnd(75, 145) * 1048576, tipo: 'b2' });
+      }
+    }
+    const pesoCarmen = eps.reduce((n, x) => n + x.size, 0);
+
+    const salud = demoPick(['healthy', 'healthy', 'degraded']);
+    const degradado = salud !== 'healthy';
+
+    const settings = {
+      yandexTtlDias: 5,
+      activityDias: 5,
+      ventanaMaxSeries: 15,
+      ventanaIdleDias: 5,
+      liveSegments: 'direct',
+      ttlFuente: { yandexPrecargaHoras: 6, manualDias: 5, xuperHoras: 3, gnulaHoras: 1, kawaiiHoras: 1, webHoras: 1 },
+      precargarAlAbrir: true,
+      busquedaCompleta: false,
+      puntajeTier2: true,
+      tier2Paralelo: true,
+      heroAnimado: true,
+      directMedia: true,
+      keepUnknown: false,
+      xuperDirecto: true,
+      xuperCuentaCompartida: false,
+      providers: { propios: true, yandex: true, xuperIdx: true, xuper: true, gnula: true, kawaii: true, fanpelis: true, web: true }
+    };
+
+    const indice = { cargado: true, origen: 'b2', generado: new Date(demoHace(2)).toISOString(), series: 10598, episodios: 388674, peliculas: 19670, variantes: 39457 };
+
+    const state = {
+      version: '3.22.28 · demo',
+      indice: indice,
+      xuperIdx: {
+        cargado: true, origen: 'local', cv: 'xuper-20261120-7', generado: new Date(demoHace(19)).toISOString(),
+        series: 11195, episodios: 455604, peliculas: 29242, urls: 30026,
+        hosts: ['yuwc.swzablvpm.com', 'zmedghe.rqsglwdvh.com'], bytes: 12183296
+      },
+      actualizador: {
+        ultima: demoHace(2), ultimaDia: demoHoy(), trigger: 'programado',
+        series: 2, episodios: 225, peliculas: 10, episodiosExistentes: 57, seriesActualizadas: 20, ms: 34000
+      },
+      semillas: { modo: 'respaldo', at: Math.floor(ahora / 1000) - 900, vigentesAutor: 152, propiasVivas: 30, horasRestantes: 5.8, avisoAt: Math.floor(ahora / 1000) - 900 },
+      sesion: { userId: '994857514177', seeds: 177, seedsAt: Math.floor(ahora / 1000) - 600, region: '', portalHost: '' },
+      seedBox: { bytes: 30981, modificada: new Date().toISOString() },
+      descartes: 22,
+      rutas: [
+        { nombre: 'Yandex', tier: '1', ipAtada: false, tramite: 'directo', video: 'directo', puente: '—', nota: 'sin IP atada' },
+        { nombre: 'Xuper', tier: '2', ipAtada: true, tramite: 'relay', video: 'directo', puente: 'Deno', nota: 'token atado a IP' },
+        { nombre: 'Gnula', tier: '3', ipAtada: true, tramite: 'Deno', video: 'Deno', puente: 'Deno', nota: 'puente obligatorio' },
+        { nombre: 'Kawaii', tier: '2', ipAtada: true, tramite: 'Deno', video: 'Deno', puente: 'Deno', nota: 'anime' },
+        { nombre: 'Fanpelis', tier: '3', ipAtada: false, tramite: 'directo', video: 'directo', puente: '—', nota: 'API propia' }
+      ],
+      status: 'healthy',
+      uptimeSec: demoRnd(3600, 90000),
+      memory: { heapMB: demoRnd(110, 140), rssMB: demoRnd(300, 360), limitMB: 353 },
+      catalog: { titulos: 35439 },
+      links: { confirmados: 120, caidos: 8 },
+      cache: { streamsCount: 137 },
+      metrics: { total: 245, ultimaHora: demoRnd(3, 20), promedioMs: 1289, tiers: [] },
+      recent: actividad.slice(0, 40),
+      cacheEntries: cacheEntries,
+      window: { activa: false },
+      sera: { activo: false },
+      mirror: { loaded: true, releaseId: 'demo', lastError: null },
+      proxies: { count: 1, list: [], reserva: 0 },
+      settings: settings,
+      providers: settings.providers,
+      activity: actividad,
+      activitySummary: { total: 245, ultimas24: 38, porFuente: [], porTipo: [] },
+      tier2: {
+        xuper: {
+          relay: { configurado: false, habilitado: false, url: '' },
+          proxies: { habilitado: true, cantidad: 1 },
+          salud: salud,
+          error: degradado ? 'Xuper no está disponible ahora' : '',
+          semillas: 177,
+          pausaHasta: degradado ? ahora + 3600000 : 0,
+          fallos: degradado ? 1 : 0,
+          curas: 2,
+          ultimaPrueba: demoHace(0.3),
+          ultimaPruebaOk: !degradado
+        },
+        gnula: { apagadaPorEntorno: false, puente: { habilitado: true, activo: true, base: 'https://demo-puente.trycloudflare.com' } }
+      },
+      bridge: { activo: true, base: 'https://demo-puente.trycloudflare.com', deno: { ok: true } },
+      sources: {
+        yandex: { ok: true, warn: false, state: 'ok', detail: '10.598 series · 388.674 episodios · 19.670 películas · generado ' + demoHoy() },
+        xuper: { ok: !degradado, warn: degradado, state: salud, detail: '1 proxies · 177 semillas' },
+        xuperIdx: { ok: true, warn: false, state: 'ok', detail: '11.195 series · 455.604 episodios · 29.242 películas' },
+        gnula: { ok: true, state: 'ok', detail: 'Byse y Vidaraa por el puente' },
+        kawaii: { ok: true, state: 'ok', detail: 'anime por el puente' },
+        web: { ok: true, state: 'parcial', detail: 'Cinecalidad, Cuevana y LaMovie' },
+        cache: { ok: true, state: 'ok', detail: '137 listas guardadas · 120 enlaces vivos' }
+      }
+    };
+
+    return {
+      state: state,
+      bridge: { deno: { ok: true, url: 'https://demo-puente.trycloudflare.com', ms: demoRnd(60, 140) } },
+      refresh: {
+        running: false,
+        fin_ts: Math.floor(demoHace(2) / 1000),
+        trigger: 'programado',
+        ok: true,
+        seg: 34,
+        error: '',
+        nunca: false,
+        pendienteB2: false,
+        proximo: '3:00–3:59 CO, cada 3 días',
+        delta: { series: 2, episodios: 225, peliculas: 10, episodiosExistentes: 57, seriesActualizadas: 20 },
+        indice: indice,
+        historial: [
+          { at: demoHace(2), trigger: 'programado', ms: 34000, series: 2, episodios: 225, peliculas: 10, episodiosExistentes: 57, error: null },
+          { at: demoHace(74), trigger: 'programado', ms: 19000, series: 0, episodios: 0, peliculas: 0, episodiosExistentes: 3, error: null },
+          { at: demoHace(146), trigger: 'manual', ms: 55000, series: 0, episodios: 3, peliculas: 0, episodiosExistentes: 3, error: null },
+          { at: demoHace(220), trigger: 'programado', ms: 71000, series: 60, episodios: 1745, peliculas: 12, episodiosExistentes: 57, error: null }
+        ],
+        logs: [
+          'episodios: 10538 series · 28 cambiadas · 0 base · 0 sin sello',
+          'serie 72304: 25 → 25 episodios',
+          'serie 76123: 10 → 13 episodios',
+          'serie 77939: 12 → 26 episodios',
+          'listo: +2 series (+225 eps), +10 películas · 34s'
+        ]
+      },
+      propios: {
+        ok: true,
+        titulos: 3,
+        episodios: eps.length,
+        bucket: 'central-propios',
+        uso: { bytes: pesoCarmen, archivos: eps.length + 2, cuotaBytes: 10 * 1073741824, cuotaGb: 10 },
+        lista: [
+          {
+            id: 'tt0167742', title: 'En busca de Carmen Sandiego', type: 'series', quality: '480p', audio: 'Latino',
+            tipo: 'b2', episodios: eps.length, pesoBytes: pesoCarmen, pesoDesconocido: 0, subtitulos: 0, detalle: eps
+          },
+          {
+            id: 'tt34969899', title: 'KINKI', type: 'movie', quality: '1080p', audio: 'Japonés',
+            tipo: 'torrent', episodios: 0, pesoBytes: 0, pesoDesconocido: 0, subtitulos: 1, detalle: [],
+            torrent: { infoHash: 'a9e950c0085c1c4566ee30a3f7afb8bd8e3fa2c5', fileIdx: 0 }
+          },
+          {
+            id: 'tt0000001', title: 'Cortometraje de prueba', type: 'movie', quality: 'HD', audio: 'Latino',
+            tipo: 'link', episodios: 0, pesoBytes: 0, pesoDesconocido: 0, subtitulos: 0, detalle: [],
+            url: 'https://example.com/video.mp4'
+          }
+        ]
+      },
+      history: { items: actividad, summary: { total: 245, ultimas24: 38, dias: 5 } },
+      search: [1, 2, 3, 4].map((i) => {
+        const t = demoPick(pelis);
+        return { id: t[0] + '-' + i, name: t[1], year: t[2], imdbRating: (demoRnd(60, 90) / 10).toFixed(1), type: 'movie', poster: '' };
+      })
+    };
+  }
+
+  async function api(path, opts = {}) {
+    const u = new URL(path, location.href);
+    const p = u.pathname;
+    if (!DEMO) DEMO = generarDemo();
+    if (p === '/api/dash/state') return DEMO.state;
+    if (p === '/api/dash/bridge') return DEMO.bridge;
+    if (p === '/api/dash/refresh/status') return DEMO.refresh;
+    if (p === '/api/dash/propios') return DEMO.propios;
+    if (p === '/api/dash/activity') return DEMO.history;
+    if (p === '/api/dash/search') {
+      const q = String(u.searchParams.get('q') || '').toLowerCase();
+      const metas = DEMO.search.filter((m) => m.name.toLowerCase().includes(q));
+      return { metas: metas.length ? metas : DEMO.search };
+    }
+    if (p === '/api/dash/providers') {
+      try { Object.assign(DEMO.state.providers, JSON.parse(opts.body || '{}').providers || {}); } catch (_) {}
+      return { ok: true, providers: DEMO.state.providers };
+    }
+    if (p === '/api/dash/settings') return { ok: true, settings: DEMO.state.settings };
+    if (p === '/api/dash/refresh') { toast('Demo: la actualización no se ejecuta'); return { ok: true }; }
+    if (p === '/api/dash/probe') { await new Promise((r) => setTimeout(r, 350)); return { ok: true, ms: demoRnd(180, 900) }; }
+    if (p === '/api/dash/propios/borrar') {
+      try {
+        const b = JSON.parse(opts.body || '{}');
+        const t = DEMO.propios.lista.find((x) => x.id === b.imdb);
+        if (t && b.season) {
+          t.detalle = t.detalle.filter((e) => !(e.t === Number(b.season) && e.e === Number(b.episode)));
+          t.episodios = t.detalle.length;
+          if (!t.detalle.length) DEMO.propios.lista = DEMO.propios.lista.filter((x) => x.id !== b.imdb);
+        } else if (t) {
+          DEMO.propios.lista = DEMO.propios.lista.filter((x) => x.id !== b.imdb);
+        }
+        DEMO.propios.titulos = DEMO.propios.lista.length;
+        DEMO.propios.episodios = DEMO.propios.lista.reduce((n, x) => n + x.episodios, 0);
+      } catch (_) {}
+      return { ok: true };
+    }
+    if (p === '/api/dash/cache/delete') { toast('Demo: la caché no se toca'); return { ok: true }; }
+    if (p.startsWith('/api/dash/cache/')) return { ok: true, ttlDias: 5 };
+    if (p === '/api/dash/action') return { ok: true };
+    if (p === '/api/dash/tier2') return { ok: true };
+    return { ok: true };
+  }
+
+  function toast(msg, kind = 'ok') {
+    const el = $('#toast');
+    el.textContent = msg;
+    el.className = 'toast show ' + kind;
+    clearTimeout(el._t);
+    el._t = setTimeout(() => { el.className = 'toast'; }, 3600);
+  }
+
+  function timeAgo(ts) {
+    const s = Math.max(0, Math.floor((Date.now() - Number(ts || 0)) / 1000));
+    if (s < 60) return 'ahora';
+    if (s < 3600) return 'hace ' + Math.floor(s / 60) + ' min';
+    if (s < 86400) return 'hace ' + Math.floor(s / 3600) + ' h';
+    return 'hace ' + Math.floor(s / 86400) + ' d';
+  }
+  function ttlText(ms) {
+    const s = Math.max(0, Number(ms) || 0) / 1000;
+    if (s <= 0) return 'vencida';
+    if (s < 3600) return Math.max(1, Math.round(s / 60)) + ' min';
+    if (s < 86400) return Math.round(s / 3600) + ' h';
+    return Math.round(s / 86400) + ' d';
+  }
+  function sourceBadge(name) {
+    const n = String(name || '').toLowerCase();
+    let cls = 'm';
+    if (n.includes('yandex')) cls = 'v';
+    else if (n.includes('xuper')) cls = 'c';
+    else if (n.includes('gnula')) cls = 'g';
+    else if (n.includes('kawaii')) cls = 'r';
+    else if (n.includes('lavie') || n.includes('cine') || n.includes('cuevana') || n.includes('lamovie') || n.includes('web')) cls = 'a';
+    return '<span class="badge ' + cls + '">' + esc(name) + '</span>';
+  }
+  function providerName(key) {
+    return ({ propios: 'Propios', yandex: 'Yandex', xuper: 'Xuper', xuperIdx: 'Xuper Idx', gnula: 'Gnula', kawaii: 'Kawaii', web: 'Scrapers web' })[key] || cap(key);
+  }
+  function providerClass(key) {
+    return ({ propios: 'p', yandex: 'v', xuper: 'c', xuperIdx: 'c', gnula: 'g', kawaii: 'p', web: 'a' })[key] || 'v';
+  }
+
+  function parseKey(key) {
+    let m = String(key || '').match(/^series:([^:]+):(\d+):(\d+)$/);
+    if (m) return { type: 'series', id: m[1], season: Number(m[2]), episode: Number(m[3]) };
+    m = String(key || '').match(/^movie:(.+)$/);
+    if (m) return { type: 'movie', id: m[1] };
+    return null;
+  }
+
+  function showGate() {
+    $('#gate').hidden = false;
+    $('#app').hidden = true;
+    setTimeout(() => $('#gateToken').focus(), 50);
+  }
+  function showApp() {
+    $('#gate').hidden = true;
+    $('#app').hidden = false;
+    aplicarGlow();
+  }
+  async function logout(show = true) {
+    try { await fetch('/api/dash/logout', { method: 'POST', credentials: 'same-origin' }); } catch (_) {}
+    if (show) { toast('Sesión cerrada'); showGate(); }
+  }
+
+  async function loadState(silent = false) {
+    if (!$('#app') || $('#app').hidden) return;
+    try {
+      const data = await api('/api/dash/state');
+      state.data = data;
+      state.activity = data.activity || [];
+      renderAll();
+      if (state.activityTab === 'historial') loadHistory();
+      if (!silent) toast('Actualizado');
+    } catch (e) {
+      if (!silent) toast(e.message, 'error');
+    }
+  }
+
+  // Refresca el encabezado y SOLO la vista activa. Las demás quedan marcadas
+  // como sucias y se pintan cuando las abres: antes se reconstruían todas
+  // cada 20 s, incluso las que no estabas viendo.
+  function renderView(id) {
+    if (!state.data) return;
+    if (id === 'inicio') {
+      renderKpis();
+      renderStatusStrip();
+      renderHomeActivity();
+    } else if (id === 'ahora') {
+      renderPrefetchCard();
+      renderActivity();
+    } else if (id === 'cache') {
+      renderCache();
+    } else if (id === 'fuentes') {
+      renderBridgeFromState();
+      renderProviders();
+      renderSeeds();
+      renderXuperLive();
+      renderXuperIdx();
+      renderRoutes();
+      renderSummaries();
+    } else if (id === 'ajustes') {
+      renderSettings();
+    }
+    state.dirty[id] = false;
+  }
+
+  function renderAll() {
+    if (!state.data) return;
+    renderHeader();
+    const activa = state.view || 'inicio';
+    renderView(activa);
+    for (const k of ['inicio', 'ahora', 'cache', 'fuentes', 'propios', 'ajustes']) {
+      if (k !== activa) state.dirty[k] = true;
+    }
+  }
+
+  function renderHeader() {
+    const d = state.data;
+    const b = d.bridge || {};
+    const health = state.bridge || {};
+    const denoOk = health.deno ? !!health.deno.ok : !!b.deno;
+    const dot = $('#heroBridgeDot');
+    const text = $('#heroBridgeText');
+    if (denoOk) { dot.className = 'dot ok'; text.textContent = 'Deno en línea · puente de video'; }
+    else { dot.className = 'dot bad'; text.textContent = 'Sin puente Deno'; }
+    const qb = $('#quickBridge');
+    if (qb) qb.textContent = denoOk ? 'Deno en línea' : 'sin puente Deno';
+    const qa = $('#quickActivity');
+    if (qa) qa.textContent = state.activity.length ? state.activity.length + ' eventos recientes' : 'sin actividad';
+    const qc = $('#quickCache');
+    if (qc) qc.textContent = fmt(d.cache.streamsCount) + ' listas guardadas';
+  }
+
+  function renderKpis() {
+    const d = state.data;
+    const gnulaEnvOff = !!(d.sources && d.sources.gnula && d.sources.gnula.forzadoPorEntorno);
+    const activas = Object.entries(d.providers || {}).filter(([k, v]) => v !== false && !(k === 'gnula' && gnulaEnvOff)).length;
+    $('#kpiTitulos').textContent = fmt(d.catalog.titulos);
+    $('#kpiTitulosSub').textContent = 'indexados';
+    $('#kpiCache').textContent = fmt(d.cache.streamsCount);
+    $('#kpiCacheSub').textContent = 'listas';
+    const totalFuentes = Object.keys(d.providers || {}).length;
+    $('#kpiFuentes').textContent = activas + '/' + totalFuentes;
+    $('#kpiFuentesSub').textContent = 'activas';
+    $('#kpiPeticiones').textContent = fmt(d.metrics && d.metrics.ultimaHora);
+    $('#kpiPeticionesSub').textContent = 'peticiones';
+  }
+
+  function renderStatusStrip() {
+    const el = $('#statusStrip');
+    if (!el || !state.data) return;
+    const src = state.data.sources || {};
+    const b = state.data.bridge || {};
+    const h = state.bridge || {};
+    const denoOk = h.deno ? !!h.deno.ok : !!b.deno;
+    const puente = { ok: denoOk, state: denoOk ? 'ok' : 'off' };
+    const items = [
+      ['Yandex', src.yandex],
+      ['Xuper', src.xuper],
+      ['Xuper Idx', src.xuperIdx],
+      ['Caché', src.cache],
+      ['Puente', puente]
+    ];
+    const clase = (s) => {
+      if (!s) return '';
+      if (s.ok) return 'ok';
+      const st = String(s.state || '').toLowerCase();
+      if (st === 'off' || st === 'apagado') return '';
+      if (st === 'degraded' || st === 'cargando' || st === 'parcial' || s.warn) return 'warn';
+      return 'bad';
+    };
+    el.innerHTML = items.map(([nombre, s]) => {
+      const st = s ? (s.state || (s.ok ? 'ok' : '—')) : '—';
+      return '<span class="status-chip"><span class="dot ' + clase(s) + '"></span><b>' + esc(nombre) + '</b> ' + esc(st) + '</span>';
+    }).join('');
+  }
+
+  function renderHomeActivity() {
+    const el = $('#homeActivity');
+    if (!el || !state.data) return;
+    const items = (state.activity || []).slice(0, 4);
+    el.innerHTML = items.length
+      ? items.map(activityRow).join('')
+      : '<div class="empty"><strong>Sin actividad reciente</strong>Cuando Nuvio pida una película o serie, aparecerá aquí.</div>';
+  }
+
+  function renderSummaries() {
+    if (!state.data) return;
+    const gnulaOff = !!(state.data.sources && state.data.sources.gnula && state.data.sources.gnula.forzadoPorEntorno);
+    const ix = state.data.indice || {};
+    const xi = state.data.xuperIdx || {};
+    const xu = (state.data.tier2 && state.data.tier2.xuper) || {};
+    const t1 = $('#t1Summary');
+    if (t1) t1.textContent = 'Yandex ' + fmt(ix.series) + ' · Xuper ' + (xi.cv || '—');
+    const t2 = $('#t2Summary');
+    if (t2) t2.textContent = 'Xuper en vivo ' + (xu.salud || '—') + ' · Kawaii';
+    const t3 = $('#t3Summary');
+    if (t3) t3.textContent = 'Gnula ' + (gnulaOff ? 'apagada' : 'activa') + ' · Fanpelis · Webs';
+    const sd = $('#saludSummary');
+    if (sd) sd.textContent = 'Xuper ' + (xu.salud || '—') + ' · ' + fmt(xu.semillas) + ' semillas';
+  }
+
+  function renderRoutes() {
+    const el = $('#routesList');
+    if (!el || !state.data) return;
+    const rutas = state.data.rutas || [];
+    el.innerHTML = rutas.map((r) => {
+      const ip = r.ipAtada ? '<span class="badge r">IP atada</span>' : '<span class="badge g">sin IP</span>';
+      return '<div class="row"><div class="row-main">' +
+        '<div class="row-title">' + esc(r.nombre) + ' <span class="badge m">Tier ' + esc(r.tier) + '</span> ' + ip + '</div>' +
+        '<div class="row-sub">Trámite: ' + esc(r.tramite) + ' · Video: ' + esc(r.video) + '</div>' +
+        '<div class="row-sub">' + esc(r.puente) + ' · ' + esc(r.nota) + '</div></div></div>';
+    }).join('');
+  }
+
+  function renderSeeds() {
+    const chips = $('#seedsChips');
+    const det = $('#seedsDetail');
+    const modeEl = $('#seedsMode');
+    if (!chips || !det || !state.data) return;
+    const s = state.data.semillas || null;
+    if (!s) {
+      if (modeEl) { modeEl.textContent = 'sin datos'; modeEl.className = 'badge m'; }
+      chips.innerHTML = '<span class="badge m">sin datos de guardia</span>';
+      det.textContent = 'La guardia de semillas aún no ha publicado su estado.';
+      return;
+    }
+    const ses = state.data.sesion || {};
+    const x = (state.data.tier2 && state.data.tier2.xuper) || {};
+    const p = state.data.proxies || {};
+    const c = state.data.seedBox || {};
+    const autor = Number(s && s.vigentesAutor) || 0;
+    const propias = Number(s && s.propiasVivas) || 0;
+    const horas = Number(s && s.horasRestantes) || 0;
+    const modo = (s && s.modo) || 'desconocido';
+    const esAutor = modo === 'autor';
+    const esResp = modo === 'respaldo';
+    const ms = (n) => { const v = Number(n) || 0; return v > 1e12 ? v : v * 1000; };
+    if (modeEl) {
+      modeEl.textContent = esAutor ? 'autor sano' : (esResp ? 'respaldo / minteo' : modo);
+      modeEl.className = 'badge ' + (esAutor ? 'g' : (esResp ? 'w' : 'm'));
+    }
+    chips.innerHTML = [
+      '<span class="badge ' + (esAutor ? 'g' : 'm') + '">' + esc(autor) + ' autor</span>',
+      '<span class="badge ' + (propias > 0 ? 'g' : 'm') + '">' + esc(propias) + ' propias</span>',
+      '<span class="badge ' + (horas > 3 ? 'g' : 'w') + '">' + horas.toFixed(1) + ' h</span>',
+      '<span class="badge v">sesión ' + esc(ses.userId || '—') + '</span>',
+      '<span class="badge m">' + esc(x.semillas || 0) + ' en plugin</span>',
+      '<span class="badge ' + (p.count ? 'g' : 'r') + '">' + esc(p.count || 0) + ' proxies</span>',
+      '<span class="badge m">semillas ' + (c.bytes ? Math.round(c.bytes / 1024) + ' KB' : '—') + '</span>'
+    ].join('');
+    const minteo = esResp ? 'Minteo activo' : 'Minteo en pausa';
+    const ultima = s && s.at ? timeAgo(ms(s.at)) : '—';
+    const aviso = s && s.avisoAt ? timeAgo(ms(s.avisoAt)) : '—';
+    const storage = ses.seeds ? (ses.seeds + ' en storage (' + (ses.seedsAt ? timeAgo(ms(ses.seedsAt)) : '—') + ')') : 'sin storage';
+    det.textContent = minteo + ' · última guardia ' + ultima + ' · aviso ' + aviso + ' · ' + storage + ' · descartes fijos ' + (state.data.descartes || 0);
+  }
+
+  function renderXuperLive() {
+    const d = state.data || {};
+    const x = (d.tier2 && d.tier2.xuper) || {};
+    const badge = $('#xuperLiveBadge');
+    const chips = $('#xuperLiveChips');
+    const det = $('#xuperLiveDetail');
+    if (!badge || !chips || !det) return;
+    const st = String(x.salud || 'desconocido');
+    const sano = st === 'healthy';
+    badge.textContent = sano ? 'sano' : (st === 'degraded' ? 'degradado' : st);
+    badge.className = 'badge ' + (sano ? 'g' : (st === 'desconocido' ? 'm' : 'r'));
+
+    const resta = Number(x.pausaHasta || 0) > Date.now() ? Number(x.pausaHasta) - Date.now() : 0;
+    const horas = resta ? Math.ceil(resta / 3600000) : 0;
+    chips.innerHTML = [
+      '<span class="badge ' + (sano ? 'g' : 'r') + '">' + esc(st) + '</span>',
+      resta > 0 ? '<span class="badge w">pausa ' + horas + ' h</span>' : '',
+      '<span class="badge m">' + esc(x.semillas || 0) + ' semillas</span>',
+      '<span class="badge m">' + esc(x.fallos || 0) + (Number(x.fallos) === 1 ? ' fallo' : ' fallos') + '</span>',
+      '<span class="badge m">' + esc(x.curas || 0) + (Number(x.curas) === 1 ? ' cura' : ' curas') + '</span>'
+    ].filter(Boolean).join('');
+
+    const partes = [];
+    if (x.ultimaPrueba) partes.push('última prueba ' + timeAgo(Number(x.ultimaPrueba)) + (x.ultimaPruebaOk ? ' (bien)' : ' (falló)'));
+    if (x.error) partes.push('motivo: ' + x.error);
+    if (resta > 0) partes.push('reintenta en ' + horas + ' h');
+    partes.push('las filas de Xuper Idx salen del índice propio y no dependen de esto');
+    det.textContent = partes.join(' · ');
+  }
+
+  function renderXuperIdx() {
+    const d = state.data || {};
+    const ix = d.xuperIdx || {};
+    const badge = $('#xuperIdxBadge');
+    if (!badge) return;
+    const listo = !!(ix.cargado && Number(ix.series) > 0);
+    const conArchivos = Number(ix.series) > 0;
+    badge.textContent = listo ? 'en línea' : (conArchivos ? 'cargando' : 'sin cargar');
+    badge.className = 'badge ' + (listo ? 'g' : (conArchivos ? 'w' : 'r'));
+    const set = (id, v) => { const el = $('#' + id); if (el) el.textContent = v; };
+    set('xSeries', fmt(ix.series));
+    set('xEps', fmt(ix.episodios));
+    set('xPelis', fmt(ix.peliculas));
+    set('xHosts', (ix.hosts && ix.hosts.length) ? String(ix.hosts.length) : '—');
+    const det = $('#xuperIdxDetail');
+    if (det) det.textContent = listo ? '' : (conArchivos ? 'Cargando en memoria…' : 'Sin cargar.');
+  }
+
+  function renderBridgeFromState() {
+    const b = state.data.bridge || {};
+    const cards = $('#bridgeCards');
+    if (!cards) return;
+    const data = state.bridge || {};
+    const deno = data.deno || { url: b.deno || '', ok: false, ms: 0, status: 0 };
+    cards.innerHTML = bridgeCard('Deno', deno, 'Puente principal', 'deno');
+    const foot = document.createElement('div');
+    foot.className = 'hint';
+    foot.style.gridColumn = '1/-1';
+    foot.textContent = 'Deno es el único puente de video';
+    cards.appendChild(foot);
+  }
+
+  function bridgeCard(name, info, sub, kind) {
+    const ok = !!info.ok;
+    const cls = ok ? 'ok' : (kind === 'deno' ? 'bad' : 'warn');
+    const stateText = ok ? 'en línea' : 'sin respuesta';
+    return '<article class="bridge-card">' +
+      '<div class="bridge-head"><div class="bridge-name"><span class="dot ' + cls + '"></span>' + esc(name) + '</div><span class="bridge-state" style="color:' + (ok ? 'var(--green)' : 'var(--red)') + '">' + stateText + '</span></div>' +
+      '<div class="bridge-url">' + esc(info.url || 'sin dirección') + '</div>' +
+      '<div class="bridge-foot"><span>' + esc(sub) + '</span><span>' + (info.ms ? info.ms + ' ms' : '—') + '</span></div>' +
+      '</article>';
+  }
+
+  async function loadBridge(force = false) {
+    if (!$('#app') || $('#app').hidden) return;
+    try {
+      const data = await api('/api/dash/bridge');
+      state.bridge = data;
+      renderHeader();
+      if (state.view === 'inicio') renderStatusStrip();
+      if (state.view === 'fuentes') renderBridgeFromState();
+      if (force) toast('Puente comprobado');
+    } catch (e) {
+      if (force) toast(e.message, 'error');
+    }
+  }
+
+  async function loadRefresh() {
+    if (!$('#app') || $('#app').hidden) return;
+    try {
+      const r = await api('/api/dash/refresh/status');
+      state.refresh = r;
+      renderRefresh();
+      if (r.running) {
+        clearTimeout(state.refreshTimer);
+        state.refreshTimer = setTimeout(loadRefresh, 5000);
+      }
+    } catch (e) {
+      const el = $('#yUltima');
+      if (el) el.title = 'No pude consultar el actualizador';
+    }
+  }
+
+  function proximaCorrida(r) {
+    const ms = r.running ? (r.inicio ? Date.parse(r.inicio) : 0) : (Number(r.fin_ts) ? Number(r.fin_ts) * 1000 : 0);
+    if (!ms) return null;
+    const diaCO = new Date(ms - 5 * 3600 * 1000).toISOString().slice(0, 10);
+    const base = Date.parse(diaCO + 'T08:00:00Z'); // 3:00 en Colombia
+    if (!Number.isFinite(base)) return null;
+    let t = base + 3 * 86400000;
+    while (t < Date.now() - 6 * 3600000) t += 3 * 86400000;
+    return t;
+  }
+
+  function fechaCorta(ts) {
+    try {
+      return new Date(ts).toLocaleDateString('es-CO', { day: 'numeric', month: 'short', timeZone: 'America/Bogota' }) + ' · 3:00';
+    } catch (_) { return '—'; }
+  }
+
+  function renderRefresh() {
+    const r = state.refresh || {};
+    const histEl = $('#refreshHistory');
+    const logsEl = $('#refreshLogs');
+    const btn = $('#btnRefreshYandex');
+    const ultimaEl = $('#yUltima');
+    if (!ultimaEl) return;
+
+    const ix = r.indice || {};
+    const hist = Array.isArray(r.historial) ? r.historial.slice(0, 3) : [];
+    const set = (id, v) => { const el = $('#' + id); if (el) el.textContent = v; };
+    set('ySeries', ix.cargado ? fmt(ix.series) : '—');
+    set('yEps', ix.cargado ? fmt(ix.episodios) : '—');
+    set('yPelis', ix.cargado ? fmt(ix.peliculas) : '—');
+    set('yVar', ix.cargado ? fmt(ix.variantes) : '—');
+    const yb = $('#yandexBadge');
+    if (yb) {
+      const sano = !!(ix.cargado && Number(ix.series) > 0);
+      yb.textContent = sano ? 'en línea' : 'sin índice';
+      yb.className = 'badge ' + (sano ? 'g' : 'r');
+    }
+
+    // Última corrida: solo el tiempo, con icono.
+    const ms = r.running ? (r.inicio ? Date.parse(r.inicio) : 0) : (Number(r.fin_ts) ? Number(r.fin_ts) * 1000 : 0);
+    const spanUltima = ultimaEl.querySelector('span');
+    if (spanUltima) spanUltima.textContent = r.running ? 'ahora' : (ms ? timeAgo(ms) : 'sin datos');
+    ultimaEl.classList.toggle('alerta', !!(!r.running && r.ok === false));
+    ultimaEl.title = r.error ? 'La última falló: ' + r.error : 'Última corrida';
+
+    // Próxima automática: icono de calendario.
+    const prox = $('#yProxima');
+    if (prox) {
+      const t = proximaCorrida(r);
+      const span = prox.querySelector('span');
+      if (span) span.textContent = t ? fechaCorta(t) : '—';
+      prox.classList.toggle('alerta', !!(t && t < Date.now()));
+      prox.title = 'Próxima automática (3–4 AM Colombia, cada 3 días)';
+    }
+
+    // Cambios: solo icono + número. Sin cambios, un check discreto.
+    const cambiosEl = $('#yCambios');
+    if (cambiosEl) {
+      const d = r.delta || {};
+      const series = Number(d.series) || 0;
+      const eps = (Number(d.episodios) || 0) + (Number(d.episodiosExistentes) || 0);
+      const pelis = Number(d.peliculas) || 0;
+      const filas = [
+        [series, 'i-series', 'series'],
+        [eps, 'i-play', 'episodios'],
+        [pelis, 'i-movie', 'películas']
+      ].filter(([v]) => v !== 0);
+      cambiosEl.innerHTML = filas.length
+        ? filas.map(([v, ic, t]) =>
+            '<span class="chg' + (v < 0 ? ' neg' : '') + '" title="' + esc((v > 0 ? '+' : '') + v + ' ' + t) + '">' +
+            '<svg class="icon"><use href="#' + ic + '"></use></svg>' + (v > 0 ? '+' : '') + v + '</span>'
+          ).join('')
+        : '<span class="ok" title="Sin cambios en la última corrida"><svg class="icon"><use href="#i-check"></use></svg></span>';
+      if (r.pendienteB2) {
+        cambiosEl.insertAdjacentHTML('beforeend',
+          '<span class="chg neg" title="Subida a B2 pendiente"><svg class="icon"><use href="#i-cloud"></use></svg>B2</span>');
+      }
+    }
+
+    if (r.running) {
+      if (btn) { btn.disabled = true; btn.textContent = 'Actualizando…'; }
+    } else {
+      clearTimeout(state.refreshTimer);
+      if (btn) {
+        btn.disabled = false;
+        btn.innerHTML = '<svg class="icon icon-sm"><use href="#i-refresh"></use></svg> Actualizar índice';
+      }
+    }
+
+    if (logsEl) {
+      const logs = Array.isArray(r.logs) ? r.logs : [];
+      logsEl.hidden = !logs.length;
+      logsEl.innerHTML = logs.length
+        ? logs.slice(-10).map((x) => '<div class="row"><div class="row-main"><div class="row-sub">' + esc(x.texto) + '</div></div></div>').join('')
+        : '';
+    }
+
+    if (histEl) {
+      histEl.innerHTML = hist.length
+        ? hist.map((x) => {
+            const seg = x.ms ? Math.round(x.ms / 1000) + 's' : '—';
+            const cambios = [
+              x.series ? '+' + x.series + ' series' : '',
+              x.episodios ? '+' + x.episodios + ' eps' : '',
+              x.peliculas ? '+' + x.peliculas + ' pelis' : '',
+              x.episodiosExistentes ? '+' + x.episodiosExistentes + ' eps existentes' : ''
+            ].filter(Boolean).join(' · ') || 'sin cambios';
+            const estado = x.error ? '<span class="badge r">falló</span>' : '<span class="badge g">ok</span>';
+            return '<div class="row"><span class="row-ico">' + estado + '</span><div class="row-main"><div class="row-title">' + esc(timeAgo(x.at)) + '</div><div class="row-sub">' + esc(cambios) + ' · ' + seg + (x.error ? ' · ' + esc(x.error) : '') + '</div></div></div>';
+          }).join('')
+        : '<div class="empty"><strong>Sin historial todavía</strong>Se llena con cada corrida del actualizador.</div>';
+    }
+  }
+
+  async function startRefresh() {
+    if (state.refresh && state.refresh.running) {
+      toast('Ya hay un refresco en curso');
+      return;
+    }
+    try {
+      const r = await api('/api/dash/refresh', { method: 'POST', body: JSON.stringify({}) });
+      if (r.ok) {
+        toast('Actualización arrancada');
+        state.refresh = { running: true, inicio: new Date().toISOString() };
+        renderRefresh();
+        clearTimeout(state.refreshTimer);
+        state.refreshTimer = setTimeout(loadRefresh, 4000);
+      } else {
+        toast(r.error || 'No pude arrancar la actualización', 'error');
+      }
+    } catch (e) {
+      toast(e.message, 'error');
+    }
+  }
+
+  let t2Timer = null;
+  let t2Foco = 'xuper';
+  let t2Ping = null;
+
+  async function pingRelay(url) {
+    if (!url) return null;
+    const t0 = performance.now();
+    try {
+      const r = await fetch(url.replace(/\/$/, '') + '/ping', { cache: 'no-store' });
+      if (!r.ok) return null;
+      await r.text();
+      return Math.round(performance.now() - t0);
+    } catch (_) { return null; }
+  }
+
+  function t2Pill(ok, textoOn, textoOff, apagado) {
+    if (apagado) return '<span class="t2-pill t2-off">' + esc(textoOff) + '</span>';
+    return '<span class="t2-pill ' + (ok ? 't2-ok' : 't2-no') + '">' + esc(ok ? textoOn : textoOff) + '</span>';
+  }
+
+  function renderTier2() {
+    const el = $('#t2card');
+    if (!el || !state.data) return;
+    const t = state.data.tier2 || {};
+    const x = t.xuper || {};
+    const g = t.gnula || {};
+    const relay = x.relay || {};
+    const proxies = x.proxies || {};
+    const puente = g.puente || {};
+
+    el.innerHTML =
+      '<div class="t2-head"><div><h3>Tier 2 · cómo está saliendo</h3>' +
+      '<p>Se actualiza cada 15 segundos. Puedes apagar cualquier escalón para probar los demás.</p></div>' +
+      '<button class="t2-x" id="t2close" aria-label="Cerrar">×</button></div>' +
+
+      '<div class="t2-step"><header><h4>1 · Relay (trámite de Xuper)</h4>' +
+      '<label class="switch"><input type="checkbox" id="t2relay"' + (relay.habilitado ? ' checked' : '') + '><span></span></label></header>' +
+      '<div class="dato">' + esc(relay.url || 'sin configurar') + '</div>' +
+      '<div class="dato">' + (relay.habilitado
+        ? (t2Ping == null ? 'midiendo…' : 'responde en ' + t2Ping + ' ms')
+        : 'apagado: Xuper sale directo o por proxies') + '</div></div>' +
+
+      '<div class="t2-step"><header><h4>2 · Proxies (respaldo de Xuper)</h4>' +
+      '<label class="switch"><input type="checkbox" id="t2proxy"' + (proxies.habilitado ? ' checked' : '') + '><span></span></label></header>' +
+      '<div class="dato">' + (proxies.cantidad || 0) + ' en la lista · se usan solo si el relay no responde</div>' +
+      '<div class="dato">Salud de Xuper: ' + t2Pill(x.salud === 'healthy', 'sano', esc(x.salud || 'desconocido'), false) +
+      (x.error ? ' · último error: ' + esc(String(x.error).slice(0, 70)) : '') + '</div></div>' +
+
+      '<div class="t2-step"><header><h4>3 · Puente (Kawaii / anime)</h4>' +
+      '<label class="switch"><input type="checkbox" id="t2bridge"' + (puente.habilitado ? ' checked' : '') + '><span></span></label></header>' +
+      '<div class="dato">' + esc(puente.base || 'sin puente configurado') + '</div>' +
+      '<div class="dato">' + (g.apagadaPorEntorno
+        ? t2Pill(false, '', 'Gnula apagada por GNULA=off en el servidor', true) +
+          ' · el puente solo afecta a Kawaii'
+        : (puente.habilitado
+          ? (puente.activo ? t2Pill(true, 'activo', 'inactivo', false) : t2Pill(false, 'activo', 'inactivo', false)) +
+            ' · Deno es el único puente'
+          : 'apagado: los enlaces de Kawaii saldrían por el proxy de Central')) + '</div></div>' +
+
+      '<div class="t2-step"><header><h4>4 · Video</h4></header>' +
+      '<div class="dato">Yandex y Propios van directo; Xuper va directo con XUPER_DIRECTO y usa Webshare solo para el trámite. ' +
+      'Gnula y Kawaii usan Deno porque su token está atado a la IP. Render queda para cabeceras que Deno no puede firmar. ' +
+      'Si apagas un escalón mientras ves algo, la reproducción no se corta.</div></div>';
+
+    $('#t2close').onclick = cerrarTier2;
+    $('#t2relay').onchange = (e) => guardarTier2({ relay: e.target.checked });
+    $('#t2proxy').onchange = (e) => guardarTier2({ proxy: e.target.checked });
+    $('#t2bridge').onchange = (e) => guardarTier2({ bridge: e.target.checked });
+  }
+
+  async function refrescarTier2() {
+    try {
+      // Reutiliza el estado que ya trae el sondeo principal: pedirlo otra vez
+      // cada 4 s gastaba ~90 MB/día de la banda de Render sin aportar nada.
+      if (document.hidden || !state.data) return;
+      const relay = (state.data.tier2 && state.data.tier2.xuper && state.data.tier2.xuper.relay) || {};
+      t2Ping = relay.habilitado ? await pingRelay(relay.url) : null;
+      renderTier2();
+    } catch (_) {}
+  }
+
+  async function guardarTier2(cambio) {
+    try {
+      const r = await api('/api/dash/tier2', { method: 'POST', body: JSON.stringify(cambio) });
+      toast('Escalón actualizado');
+      await refrescarTier2();
+      if (r && r.settings) state.data.settings = r.settings;
+    } catch (e) {
+      toast(e.message, 'error');
+      renderTier2();
+    }
+  }
+
+  async function abrirTier2(foco) {
+    t2Foco = foco || 'xuper';
+    const back = $('#t2back');
+    if (!back) return;
+    back.classList.add('open');
+    abrirOverlay('tier2');
+    await refrescarTier2();
+    clearInterval(t2Timer);
+    t2Timer = setInterval(refrescarTier2, 15000);
+  }
+
+  function cerrarTier2(desdePop) {
+    const back = $('#t2back');
+    if (back) back.classList.remove('open');
+    const era = cerrarOverlay('tier2');
+    if (era && !desdePop) history.back();
+    clearInterval(t2Timer);
+    t2Timer = null;
+  }
+
+  function renderProviders() {
+    const caja = $('#fuentesCascade');
+    if (!caja || !state.data) return;
+    const prov = state.data.providers || {};
+    const gnulaOff = !!(state.data.sources && state.data.sources.gnula && state.data.sources.gnula.forzadoPorEntorno);
+    const defs = {
+      yandex: { name: 'Yandex', desc: 'Catálogo directo', icon: 'i-layers' },
+      xuperIdx: { name: 'Xuper Idx', desc: 'Catálogo propio · 2 hosts', icon: 'i-database' },
+      xuper: { name: 'Xuper', desc: 'Portal y cuenta', icon: 'i-play' },
+      kawaii: { name: 'Kawaii', desc: 'Anime por el puente', icon: 'i-series' },
+      gnula: { name: 'Gnula', desc: gnulaOff ? 'Apagada por GNULA=off' : 'Byse y Vidaraa por el puente', icon: 'i-movie' },
+      fanpelis: { name: 'Fanpelis', desc: 'API propia · 1080p latino', icon: 'i-movie' },
+      web: { name: 'Scrapers web', desc: 'Cinecalidad, Cuevana, LaMovie', icon: 'i-globe' }
+    };
+    const fila = (p, key) => {
+      const forzadoOff = key === 'gnula' && gnulaOff;
+      const on = !forzadoOff && prov[key] !== false;
+      const detalle = (key === 'xuper' || key === 'gnula') ? ' data-detalle="' + key + '"' : '';
+      return '<article class="provider" style="cursor:' + (detalle ? 'pointer' : 'default') + '"' + detalle + '>' +
+        '<div class="provider-ico ' + providerClass(key) + '"><svg class="icon"><use href="#' + p.icon + '"></use></svg></div>' +
+        '<div class="provider-main"><strong>' + esc(p.name) + '</strong><span>' + esc(p.desc) + '</span></div>' +
+        '<label class="switch" aria-label="Activar ' + attr(p.name) + '"><input type="checkbox" data-provider="' + key + '"' + (on ? ' checked' : '') + (forzadoOff ? ' disabled aria-disabled="true"' : '') + '><span></span></label>' +
+        '</article>';
+    };
+    const grupos = [
+      ['provGridT2', ['xuper', 'kawaii']],
+      ['provGridT3', ['gnula', 'fanpelis', 'web']]
+    ];
+    for (const [id, keys] of grupos) {
+      const el = document.getElementById(id);
+      if (el) el.innerHTML = keys.map((k) => fila(defs[k], k)).join('');
+    }
+    for (const key of ['propios', 'yandex', 'xuperIdx']) {
+      const sw = caja.querySelector('[data-provider="' + key + '"]');
+      if (sw) sw.checked = prov[key] !== false;
+    }
+    $$('[data-provider]', caja).forEach((input) => {
+      if (input.dataset.provider === 'propios') {
+        input.addEventListener('change', () => toggleProvider('propios', input.checked));
+      } else {
+        input.addEventListener('change', () => toggleProvider(input.dataset.provider, input.checked));
+      }
+    });
+    $$('[data-detalle]', caja).forEach((card) => {
+      card.addEventListener('click', (ev) => {
+        if (ev.target.closest('.switch')) return;
+        abrirTier2(card.dataset.detalle);
+      });
+    });
+  }
+
+  async function toggleProvider(key, checked) {
+    const prov = { ...(state.data.providers || {}), [key]: checked };
+    if (!Object.values(prov).some(Boolean)) {
+      toast('Deja al menos una fuente activa', 'error');
+      renderProviders();
+      return;
+    }
+    try {
+      const r = await api('/api/dash/providers', { method: 'POST', body: JSON.stringify({ providers: prov }) });
+      state.data.providers = r.providers;
+      state.data.settings.providers = r.providers;
+      toast(providerName(key) + (checked ? ' activado' : ' desactivado'));
+      renderProviders();
+      renderKpis();
+    } catch (e) {
+      toast(e.message, 'error');
+      renderProviders();
+    }
+  }
+
+  function renderPrefetchCard() {
+    const el = $('#prefetchCard');
+    if (!el || !state.data) return;
+    const w = state.data.window || {};
+    const series = (w.series || []).slice().sort((a, b) => (b.at || 0) - (a.at || 0));
+    const dos = (v) => String(parseInt(v, 10) || 0).padStart(2, '0');
+    const crudo = w.lastAction || (series.length ? 'ventana activa' : 'Se activa al abrir un capítulo; guarda el siguiente según la fuente.');
+    const ultima = crudo.replace(/S(\d+)E(\d+)/gi, (m, a, b) => 'S' + dos(a) + 'E' + dos(b));
+
+    // Nombre de la serie: la caché y la actividad ya lo traen; el estado de la
+    // ventana solo guarda el id.
+    const nombres = new Map();
+    for (const e of (state.data.cacheEntries || [])) {
+      const p = parseKey(e.key);
+      if (p && p.type === 'series' && e.sample && !nombres.has(p.id)) {
+        nombres.set(p.id, String(e.sample).split('|')[0].split('\n')[0].split(' · ')[0].replace(/\s*T\d+E\d+\s*$/i, '').trim());
+      }
+    }
+    for (const x of (state.data.activity || [])) {
+      if (x.type === 'series' && x.id && x.title && !nombres.has(x.id)) {
+        nombres.set(x.id, String(x.title).replace(/\s*T\d+E\d+\s*$/i, '').trim());
+      }
+    }
+
+    // Solo la serie más reciente: la tarjeta es un resumen, no una lista.
+    const chips = series.slice(0, 1).map((x) => {
+      const n = x.next || { s: x.s, e: x.e + 1 };
+      const t = x.next && x.next.ttlLeftMs > 0 ? ' · ' + ttlText(x.next.ttlLeftMs) : '';
+      const nombre = nombres.get(x.serie) || x.serie;
+      return '<span class="chip">' + esc(nombre) + ' · S' + dos(x.s) + 'E' + dos(x.e) + ' → S' + dos(n.s) + 'E' + dos(n.e) + t + '</span>';
+    }).join('');
+    const activa = !(state.data.settings && state.data.settings.precargarAlAbrir === false);
+    const estado = !activa ? 'apagada' : (w.prefetching ? 'precargando…' : (series.length ? 'activa' : 'en espera'));
+    el.innerHTML =
+      '<div class="row-ico"><svg class="icon icon-sm"><use href="#i-pulse"></use></svg></div>' +
+      '<div class="row-main"><div class="row-title">Precarga de episodios</div>' +
+      '<div class="row-sub">' + esc(ultima) + ' · ' + esc(estado) + '</div>' +
+      (chips && activa ? '<div class="chips">' + chips + '</div>' : '') + '</div>' +
+      '<div class="row-side"><label class="switch" aria-label="Activar precarga"><input type="checkbox" id="switchPrefetch"' + (activa ? ' checked' : '') + '><span></span></label></div>';
+
+    const sw = $('#switchPrefetch');
+    if (sw) sw.addEventListener('change', async () => {
+      try {
+        await api('/api/dash/settings', { method: 'POST', body: JSON.stringify({ precargarAlAbrir: sw.checked }) });
+        if (!state.data.settings) state.data.settings = {};
+        state.data.settings.precargarAlAbrir = sw.checked;
+        toast(sw.checked ? 'Precarga activada' : 'Precarga apagada');
+        renderPrefetchCard();
+      } catch (err) {
+        sw.checked = !sw.checked;
+        toast(err.message, 'error');
+      }
+    });
+  }
+
+  function activityRow(x) {
+    const isSeries = x.type === 'series';
+    const srcs = (x.sources && x.sources.length ? x.sources : [x.tier || 'actividad']);
+    const live = Date.now() - Number(x.ts || 0) < 2 * 60 * 1000;
+    return '<article class="row">' +
+      '<div class="row-ico"><svg class="icon icon-sm"><use href="#' + (isSeries ? 'i-series' : 'i-movie') + '"></use></svg></div>' +
+      '<div class="row-main"><div class="row-title">' + esc(x.title || x.id || 'Sin título') + '</div>' +
+      '<div class="row-sub">' + srcs.map(sourceBadge).join('') + '<span>' + (isSeries ? 'serie' : 'película') + '</span></div></div>' +
+      '<div class="row-side"><div class="row-time">' + (live ? '<span class="dot ok live" style="display:inline-block;margin-right:5px"></span>' : '') + timeAgo(x.ts) + '</div></div>' +
+      '</article>';
+  }
+
+  function renderActivity() {
+    const liveEl = $('#activityLive');
+    const histEl = $('#activityHistory');
+    const hint = $('#activityHint');
+    if (!liveEl || !histEl) return;
+    const live = state.activity.filter((x) => Date.now() - Number(x.ts || 0) < 10 * 60 * 1000);
+    if (state.activityTab === 'live') {
+      liveEl.hidden = false; histEl.hidden = true;
+      liveEl.innerHTML = live.length ? live.map(activityRow).join('') : '<div class="empty"><strong>Sin actividad en los últimos 10 minutos</strong>Cuando el addon pida una película o serie, aparecerá aquí.</div>';
+      hint.textContent = live.length ? live.length + ' en vivo' : 'sin actividad';
+    } else {
+      liveEl.hidden = true; histEl.hidden = false;
+      const items = state.history || [];
+      const sum = state.historySummary || {};
+      const head = '<div class="row" style="background:rgba(232,132,90,.07)"><div class="row-main"><div class="row-title">Últimos ' + (sum.dias || 5) + ' días</div><div class="row-sub">' + fmt(sum.total) + ' eventos · ' + fmt(sum.ultimas24) + ' en 24 h</div></div></div>';
+      histEl.innerHTML = head + (items.length ? items.map(activityRow).join('') : '<div class="empty"><strong>Todavía no hay historial</strong>Se llena con cada reproducción que pida el addon.</div>');
+      hint.textContent = fmt(sum.total) + ' eventos';
+    }
+  }
+
+  async function loadHistory() {
+    try {
+      const r = await api('/api/dash/activity?limit=500');
+      state.history = r.items || [];
+      state.historySummary = r.summary || {};
+      renderActivity();
+    } catch (e) { toast(e.message, 'error'); }
+  }
+
+  function groupCache(entries) {
+    const map = new Map();
+    for (const e of entries || []) {
+      const p = parseKey(e.key);
+      if (!p) continue;
+      const gid = p.type + ':' + p.id;
+      let g = map.get(gid);
+      if (!g) {
+        g = { type: p.type, id: p.id, keys: [], episodes: [], count: 0, ttl: 0, sample: '', manual: false, prefetch: false };
+        map.set(gid, g);
+      }
+      g.keys.push(e.key);
+      g.count += Number(e.count) || 0;
+      g.ttl = Math.max(g.ttl, Number(e.ttlLeftMs) || 0);
+      g.manual = g.manual || !!e.manual;
+      g.prefetch = g.prefetch || !!e.prefetch;
+      if (p.type === 'series') g.episodes.push({ s: p.season, e: p.episode, ttl: Number(e.ttlLeftMs) || 0, prefetch: !!e.prefetch, manual: !!e.manual, count: Number(e.count) || 0 });
+      if (!g.sample && e.sample) g.sample = e.sample;
+    }
+    return map;
+  }
+
+  function cacheTitle(g) {
+    const s = String(g.sample || '');
+    const before = s.split('|')[0].split('\n')[0].trim();
+    return before || (g.type === 'series' ? 'Serie ' + g.id : 'Película ' + g.id);
+  }
+
+  function renderCache() {
+    const list = $('#cacheList');
+    if (!list || !state.data) return;
+    const groups = groupCache(state.data.cacheEntries || []);
+    state.cacheGroups = groups;
+    let arr = Array.from(groups.values());
+    if (state.cacheType !== 'all') arr = arr.filter((g) => g.type === state.cacheType);
+    if (state.cacheFilter) {
+      const q = state.cacheFilter.toLowerCase();
+      arr = arr.filter((g) => (cacheTitle(g) + ' ' + g.id).toLowerCase().includes(q));
+    }
+    arr.sort((a, b) => b.ttl - a.ttl);
+    const total = arr.length;
+    const visibles = arr.slice(0, state.cacheShown || 20);
+    $('#cacheHint').textContent = total + ' grupos · ' + fmt(state.data.cache.streamsCount) + ' listas';
+    if (!arr.length) {
+      list.innerHTML = '<div class="empty"><strong>No hay caché con ese filtro</strong>Busca un título y guárdalo por 5 días.</div>';
+      return;
+    }
+    // El refresco cada 10 s reemplazaba la lista y cerraba el desplegable.
+    // Se evita reconstruir cuando la composición no cambió.
+    const firma = visibles.map((g) => g.id + '|' + g.episodes.length + '|' + Math.round(g.ttl / 60000) + '|' + (g.manual ? 1 : 0) + (g.prefetch ? 1 : 0)).join('~') + '#' + visibles.length;
+    if (list.dataset.firma === firma) return;
+    list.dataset.firma = firma;
+
+    list.innerHTML = visibles.map((g) => {
+      const dias = g.ttl / 86400000;
+      const ttlCls = dias < 1 ? 'crit' : (dias < 3 ? 'low' : '');
+      const flags = (g.manual ? '<span class="badge m">manual</span>' : '') + (g.prefetch ? '<span class="badge c">precarga</span>' : '');
+      const eps = g.type === 'series' ? g.episodes.slice(0, 10).map((x) => '<span class="chip">S' + x.s + 'E' + x.e + '</span>').join('') : '';
+      const more = g.type === 'series' && g.episodes.length > 10 ? '<span class="chip">+' + (g.episodes.length - 10) + '</span>' : '';
+      return '<article class="cache-card" data-group="' + attr(g.type + ':' + g.id) + '">' +
+        '<div class="cache-ico"><svg class="icon"><use href="#' + (g.type === 'series' ? 'i-series' : 'i-movie') + '"></use></svg></div>' +
+        '<div><div class="cache-title">' + esc(cacheTitle(g)) + ' ' + flags + '</div>' +
+        '<div class="cache-meta"><span>' + (g.type === 'series' ? g.episodes.length + ' episodios' : fmt(g.count) + ' fuentes') + '</span><span>·</span><span class="ttl ' + ttlCls + '">' + ttlText(g.ttl) + '</span></div>' +
+        (eps || more ? '<div class="chips">' + eps + more + '</div>' : '') +
+        '</div>' +
+        '<div class="cache-actions">' +
+        '<button class="btn sm" data-action="extend" data-group="' + attr(g.type + ':' + g.id) + '"><svg class="icon icon-sm"><use href="#i-clock"></use></svg> 5 días</button>' +
+        (g.type === 'series' ? '<button class="btn sm" data-action="prewarm" data-group="' + attr(g.type + ':' + g.id) + '"><svg class="icon icon-sm"><use href="#i-plus"></use></svg> Episodios</button>' : '') +
+        (g.type === 'series' && g.episodes.length ? '<button class="btn sm' + (state.ttlAbiertos.has(g.type + ':' + g.id) ? ' activo' : '') + '" data-tiempos="' + attr(g.type + ':' + g.id) + '"><svg class="icon icon-sm"><use href="#i-clock"></use></svg> Tiempos</button>' : '') +
+        '<button class="btn sm danger" data-action="delete" data-group="' + attr(g.type + ':' + g.id) + '"><svg class="icon icon-sm"><use href="#i-trash"></use></svg></button>' +
+        '</div>' +
+        (g.type === 'series' && g.episodes.length
+          ? '<div class="ttl-list" data-ttl="' + attr(g.type + ':' + g.id) + '"' + (state.ttlAbiertos.has(g.type + ':' + g.id) ? '' : ' hidden') + '>' +
+            g.episodes.slice().sort((a, b) => a.s - b.s || a.e - b.e).map((x) => {
+              const cls = x.ttl < 86400000 ? 'crit' : (x.ttl < 3 * 86400000 ? 'low' : '');
+              return '<div class="ttl-row">' +
+                '<span class="mono">S' + String(x.s).padStart(2, '0') + 'E' + String(x.e).padStart(2, '0') + '</span>' +
+                '<span class="ttl ' + cls + '">' + ttlText(x.ttl) + '</span>' +
+                (x.manual ? '<span class="badge m">manual</span>' : (x.prefetch ? '<span class="badge c">precarga</span>' : '')) +
+                '</div>';
+            }).join('') + '</div>'
+          : '') +
+        '</article>';
+    }).join('') + (total > visibles.length
+      ? '<button class="btn" id="cacheMore" style="margin-top:4px">Ver más (' + (total - visibles.length) + ')</button>'
+      : '');
+    const mas = $('#cacheMore');
+    if (mas) mas.addEventListener('click', () => { state.cacheShown = (state.cacheShown || 20) + 20; list.dataset.firma = ''; renderCache(); });
+  }
+
+  async function extendGroup(g) {
+    try {
+      const ttl = (state.data.settings && state.data.settings.yandexTtlDias) || 5;
+      const r = await api('/api/dash/cache/extend', { method: 'POST', body: JSON.stringify({ type: g.type, id: g.id, ttlDias: ttl }) });
+      toast(r.ok ? 'Caché extendida ' + r.ttlDias + ' días' : 'No hay entradas para extender', r.ok ? 'ok' : 'error');
+      await loadState(true);
+    } catch (e) { toast(e.message, 'error'); }
+  }
+
+  async function deleteGroup(g) {
+    openModal('Borrar caché', '<p class="muted" style="font-size:12px;line-height:1.6">Se borrará la caché de <strong>' + esc(cacheTitle(g)) + '</strong>. La próxima vez se resolverá de nuevo.</p><div class="modal-actions"><button class="btn" data-close>Cancelar</button><button class="btn danger" id="confirmDelete">Borrar</button></div>');
+    $('#confirmDelete').addEventListener('click', async () => {
+      closeModal();
+      try {
+        const r = await api('/api/dash/cache/delete', { method: 'POST', body: JSON.stringify({ type: g.type, id: g.id }) });
+        toast(r.ok ? 'Caché borrada' : 'No había nada que borrar', r.ok ? 'ok' : 'error');
+        await loadState(true);
+      } catch (e) { toast(e.message, 'error'); }
+    });
+  }
+
+  function openPrewarmSeries(g) {
+    const tiene = g && g.episodes && g.episodes.length;
+    const maxEp = tiene ? Math.max(...g.episodes.map((x) => x.e)) : 0;
+    const season = tiene ? g.episodes[0].s : 1;
+    openModal('Precargar episodios', '' +
+      '<p class="muted" style="font-size:12px;line-height:1.6;margin-top:0">Guarda episodios por 5 días para que abran rápido.</p>' +
+      '<div class="form-grid"><div class="field"><label>Temporada</label><input id="pwSeason" type="number" min="1" value="' + season + '"></div>' +
+      '<div class="field"><label>Desde episodio</label><input id="pwEpisode" type="number" min="1" value="' + (maxEp + 1) + '"></div>' +
+      '<div class="field full"><label>Cuántos</label><select id="pwCount"><option value="1">1 episodio</option><option value="3" selected>3 episodios</option><option value="5">5 episodios</option></select></div></div>' +
+      '<div class="modal-actions"><button class="btn" data-close>Cancelar</button><button class="btn primary" id="pwGo">Guardar</button></div>');
+    $('#pwGo').addEventListener('click', async () => {
+      const season = Number($('#pwSeason').value) || 1;
+      const episode = Number($('#pwEpisode').value) || 1;
+      const count = Number($('#pwCount').value) || 1;
+      closeModal();
+      await prewarm({ type: 'series', id: g.id, season, episode, count });
+    });
+  }
+
+  async function prewarm(payload) {
+    toast('Preparando caché…');
+    try {
+      const r = await api('/api/dash/cache/prewarm', { method: 'POST', body: JSON.stringify({ ...payload, ttlDias: (state.data.settings && state.data.settings.yandexTtlDias) || 5 }) });
+      const ok = (r.resultados || []).filter((x) => x.ok).length;
+      toast(r.ok ? ok + ' episodio(s)/título(s) en caché' : 'No se encontraron fuentes', r.ok ? 'ok' : 'error');
+      await loadState(true);
+    } catch (e) { toast(e.message, 'error'); }
+  }
+
+  function renderSettings() {
+    if (!state.data || !state.data.settings) return;
+    const s = state.data.settings;
+    if (state.settingsDirty) return;
+    const set = (id, v) => { const el = $('#' + id); if (el) el.value = v; };
+    const t = s.ttlFuente || {};
+    set('setTtl', s.yandexTtlDias);
+    set('setManualD', t.manualDias);
+    set('setActivity', s.activityDias);
+    set('setMax', s.ventanaMaxSeries);
+    set('setIdle', s.ventanaIdleDias);
+    set('setLive', s.liveSegments);
+    set('setYandexPre', t.yandexPrecargaHoras);
+    set('setXuperH', t.xuperHoras);
+    set('setGnulaH', t.gnulaHoras);
+    set('setKawaiiH', t.kawaiiHoras);
+    set('setWebH', t.webHoras);
+    const chk = (id, v) => { const el = $('#' + id); if (el) el.checked = !!v; };
+    chk('setPrefetch', s.precargarAlAbrir);
+    chk('setCompleta', s.busquedaCompleta);
+    chk('setPuntaje', s.puntajeTier2 !== false);
+    chk('setParalelo', s.tier2Paralelo !== false);
+    chk('setHero', s.heroAnimado !== false);
+    chk('setDirect', s.directMedia);
+    chk('setUnknown', s.keepUnknown);
+    chk('setXuper', s.xuperDirecto);
+    chk('setXuperShared', s.xuperCuentaCompartida);
+  }
+
+  async function saveSettings(e) {
+    e.preventDefault();
+    const body = {
+      yandexTtlDias: Number($('#setTtl').value),
+      ttlFuente: {
+        yandexPrecargaHoras: Number($('#setYandexPre').value),
+        xuperHoras: Number($('#setXuperH').value),
+        gnulaHoras: Number($('#setGnulaH').value),
+        kawaiiHoras: Number($('#setKawaiiH').value),
+        webHoras: Number($('#setWebH').value),
+        manualDias: Number($('#setManualD').value)
+      },
+      precargarAlAbrir: $('#setPrefetch').checked,
+      busquedaCompleta: $('#setCompleta').checked,
+      puntajeTier2: $('#setPuntaje').checked,
+      tier2Paralelo: $('#setParalelo').checked,
+      heroAnimado: $('#setHero').checked,
+      activityDias: Number($('#setActivity').value),
+      ventanaMaxSeries: Number($('#setMax').value),
+      ventanaIdleDias: Number($('#setIdle').value),
+      liveSegments: $('#setLive').value,
+      directMedia: $('#setDirect').checked,
+      keepUnknown: $('#setUnknown').checked,
+      xuperDirecto: $('#setXuper').checked,
+      xuperCuentaCompartida: $('#setXuperShared').checked
+    };
+    try {
+      const r = await api('/api/dash/settings', { method: 'POST', body: JSON.stringify(body) });
+      if (r.ok) {
+        state.data.settings = r.settings;
+        state.settingsDirty = false;
+        toast('Ajustes guardados');
+        await loadState(true);
+        aplicarGlow();
+      } else toast(r.error || 'No se pudieron guardar', 'error');
+    } catch (err) { toast(err.message, 'error'); }
+  }
+
+  function openSearch() {
+    abrirOverlay('search');
+    $('#searchSheet').classList.add('open');
+    setTimeout(() => $('#searchInput').focus(), 60);
+    if (!$('#searchResults').dataset.ready) {
+      $('#searchResults').dataset.ready = '1';
+      $('#searchResults').innerHTML = '<div class="empty"><strong>Busca una película o serie</strong>Puedes guardarla 5 días en caché.</div>';
+    }
+  }
+  function closeSearch(desdePop) {
+    $('#searchSheet').classList.remove('open');
+    const era = cerrarOverlay('search');
+    if (era && !desdePop) history.back();
+  }
+
+  async function doSearch() {
+    const q = $('#searchInput').value.trim();
+    const type = state.searchType;
+    const box = $('#searchResults');
+    if (q.length < 2) { box.innerHTML = '<div class="empty"><strong>Escribe al menos 2 letras</strong></div>'; return; }
+    box.innerHTML = '<div class="empty"><strong>Buscando…</strong></div>';
+    try {
+      const r = await api('/api/dash/search?q=' + encodeURIComponent(q) + '&type=' + type);
+      const metas = r.metas || [];
+      state.searchMetas = new Map(metas.map((m) => [m.id, m]));
+      if (!metas.length) { box.innerHTML = '<div class="empty"><strong>Sin resultados</strong>Prueba con otro título.</div>'; return; }
+      box.innerHTML = metas.map((m) => {
+        const poster = m.poster && /^https?:\/\//.test(m.poster)
+          ? '<img class="poster" src="' + attr(m.poster) + '" alt="" loading="lazy">'
+          : '<div class="poster-ph"><svg class="icon icon-sm"><use href="#i-movie"></use></svg></div>';
+        const action = m.type === 'series'
+          ? '<button class="btn sm primary" data-series="' + attr(m.id) + '">Elegir capítulo</button>'
+          : '<button class="btn sm primary" data-save="' + attr(m.id) + '">Guardar 5 días</button>';
+        return '<div class="result">' + poster + '<div class="result-main"><strong>' + esc(m.name || m.id) + '</strong><span>' + esc(m.year || '') + (m.imdbRating ? ' · ★ ' + esc(m.imdbRating) : '') + ' · ' + (m.type === 'series' ? 'serie' : 'película') + '</span></div><div class="result-actions">' + action + '</div></div>';
+      }).join('');
+      $$('[data-save]', box).forEach((b) => b.addEventListener('click', () => prewarm({ type: 'movie', id: b.dataset.save })));
+      $$('[data-series]', box).forEach((b) => b.addEventListener('click', () => {
+        const m = state.searchMetas.get(b.dataset.series) || { id: b.dataset.series, type: 'series' };
+        openPrewarmSeries({ id: m.id, type: 'series', episodes: [] });
+      }));
+    } catch (e) {
+      box.innerHTML = '<div class="empty"><strong>Error</strong>' + esc(e.message) + '</div>';
+    }
+  }
+
+  function openModal(title, body) {
+    abrirOverlay('modal');
+    $('#modalTitle').textContent = title;
+    $('#modalBody').innerHTML = body;
+    $('#modal').classList.add('open');
+    $$('[data-close]', $('#modalBody')).forEach((b) => b.addEventListener('click', closeModal));
+  }
+  function closeModal(desdePop) {
+    $('#modal').classList.remove('open');
+    const era = cerrarOverlay('modal');
+    if (era && !desdePop) history.back();
+  }
+
+  // ---------- capa 0 ----------
+  async function loadPropiosResumen() {
+    try {
+      const p = await api('/api/dash/propios');
+      state.propios = p.lista || [];
+      const u = p.uso || {};
+      const usado = Number(u.bytes) || 0;
+      const cuota = Number(u.cuotaBytes) || 0;
+      const libre = Math.max(0, cuota - usado);
+      const set = (id, v) => { const el = $('#' + id); if (el) el.textContent = v; };
+      const gb = (n) => (n / 1073741824).toFixed(2).replace('.', ',') + ' GB';
+      set('b2Usado', usado >= 1073741824 ? gb(usado) : peso(usado));
+      set('b2Libre', cuota ? gb(libre) : '—');
+      const bar = $('#b2Bar');
+      if (bar) bar.style.width = cuota ? Math.min(100, (usado / cuota) * 100).toFixed(1) + '%' : '0%';
+      const t0 = $('#t0Summary');
+      if (t0) t0.textContent = 'Backblaze · ' + (Number(p.titulos) || 0) + ((Number(p.titulos) === 1) ? ' título' : ' títulos');
+      const det = $('#b2Detalle');
+      if (det) {
+        const nt = Number(p.titulos) || 0;
+        det.textContent = cuota
+          ? (Number(u.archivos) || 0) + ' archivos · ' + nt + (nt === 1 ? ' título' : ' títulos') + ' · cuota ' + (u.cuotaGb || 10) + ' GB'
+          : 'Sin credenciales de Backblaze.';
+      }
+    } catch (_) {}
+  }
+
+  async function loadPropios() {
+    try {
+      const p = await api('/api/dash/propios');
+      renderPropios(p);
+    } catch (e) { toast(e.message, 'error'); }
+  }
+
+  function peso(bytes) {
+    const n = Number(bytes) || 0;
+    if (!n) return '—';
+    if (n >= 1073741824) return (n / 1073741824).toFixed(1).replace('.', ',') + ' GB';
+    if (n >= 1048576) return Math.round(n / 1048576) + ' MB';
+    return Math.round(n / 1024) + ' KB';
+  }
+
+  function renderPropios(p) {
+    const lista = p.lista || [];
+    state.propios = lista;
+    const meta = $('#propiosMeta');
+    if (meta) meta.textContent = (p.episodios || 0) + ' episodios · ' + (p.titulos || 0) + ' título(s) · ' + (p.bucket || 'sin bucket');
+    const caja = $('#propiosList');
+    if (!caja) return;
+    const tipoNombre = { b2: 'B2', link: 'Link', torrent: 'Torrent', mixto: 'Mixto' };
+    const tipoClase = { b2: 'g', link: 'v', torrent: 'a', mixto: 'w' };
+
+    caja.innerHTML = lista.map((t) => {
+      const pesoTexto = peso(t.pesoBytes);
+      const extra = t.pesoDesconocido ? ' · ' + t.pesoDesconocido + ' sin peso' : '';
+      return '<div class="cache-card">' +
+        '<div class="cache-ico"><svg class="icon"><use href="#i-archive"></use></svg></div>' +
+        '<div style="min-width:0">' +
+        '<div class="cache-title">' + esc(t.title) + '</div>' +
+        '<div class="cache-meta"><span>' + esc(t.id) + '</span><span>·</span><span>' + t.episodios + ' eps</span>' +
+        (t.quality ? '<span>·</span><span>' + esc(t.quality) + '</span>' : '') +
+        (t.audio ? '<span>·</span><span>' + esc(t.audio) + '</span>' : '') +
+        '<span>·</span><span class="badge ' + (tipoClase[t.tipo] || 'm') + '">' + (tipoNombre[t.tipo] || t.tipo) + '</span>' +
+        '<span>·</span><span>' + pesoTexto + extra + '</span>' +
+        '</div></div>' +
+        '<button class="btn sm" data-abrir-propios="' + esc(t.id) + '">Abrir</button>' +
+        '<button class="btn ghost sm danger" data-borrar-titulo="' + esc(t.id) + '" title="Eliminar todo el título"><svg class="icon icon-sm"><use href="#i-trash"></use></svg></button>' +
+        '</div>';
+    }).join('');
+
+    const vacio = $('#propiosEmpty');
+    if (vacio) vacio.hidden = lista.length > 0;
+  }
+
+  function renderEpisodiosPropios(t) {
+    const body = $('#propiosSheetBody');
+    if (!body) return;
+    const q = String(($('#propiosEpFilter') && $('#propiosEpFilter').value) || '').trim().toLowerCase();
+    const det = (t.detalle || []).filter((e) => {
+      if (!q) return true;
+      const et = ('t' + e.t + 'e' + String(e.e).padStart(2, '0'));
+      return et.includes(q) || String(e.e) === q;
+    });
+    if (!det.length) {
+      body.innerHTML = '<div class="empty"><strong>Sin episodios con ese filtro</strong>Prueba con otro número.</div>';
+      return;
+    }
+    body.innerHTML = det.map((e) => (
+      '<div class="row"><div class="row-main">' +
+      '<div class="row-title">T' + e.t + 'E' + String(e.e).padStart(2, '0') + '</div>' +
+      '<div class="row-sub"><span class="badge ' + (e.tipo === 'link' ? 'v' : 'g') + '">' + (e.tipo === 'link' ? 'Link' : 'B2') + '</span><span>' + peso(e.size) + '</span></div>' +
+      '</div>' +
+      '<button class="btn ghost sm" data-probar="' + attr(t.id + ':' + e.t + ':' + e.e) + '">Probar</button>' +
+      '<button class="btn ghost sm danger" data-borrar-ep="' + attr(t.id + ':' + e.t + ':' + e.e) + '" title="Eliminar">×</button>' +
+      '</div>'
+    )).join('');
+  }
+
+  function abrirPropios(id) {
+    const t = (state.propios || []).find((x) => x.id === id);
+    if (!t) return;
+    state.propiosAbierto = t;
+    const titulo = $('#propiosSheetTitle');
+    if (titulo) titulo.textContent = t.title;
+    const filtro = $('#propiosEpFilter');
+    if (filtro) filtro.value = '';
+    renderEpisodiosPropios(t);
+    $('#propiosSheet').classList.add('open');
+    abrirOverlay('propios');
+  }
+
+  function cerrarPropios(desdePop) {
+    $('#propiosSheet').classList.remove('open');
+    state.propiosAbierto = null;
+    const era = cerrarOverlay('propios');
+    if (era && !desdePop) history.back();
+  }
+
+  async function borrarPropio(id, season, episode) {
+    const t = (state.propios || []).find((x) => x.id === id) || { id, title: id, episodios: 0 };
+    const partes = [];
+    if (Number.isFinite(season) && Number.isFinite(episode)) {
+      const d = (t.detalle || []).find((x) => x.t === season && x.e === episode) || {};
+      const titulo = 'T' + season + 'E' + String(episode).padStart(2, '0');
+      partes.push('¿Eliminar ' + t.title + ' ' + titulo + '?', '', (d.size ? peso(d.size) : 'Peso desconocido') +
+        (d.tipo === 'link' ? ' · es un enlace' : ' · archivo en B2'));
+      if (d.tipo !== 'link') partes.push('', 'El archivo se borra de Backblaze. No se puede recuperar.');
+    } else {
+      partes.push('¿Eliminar "' + t.title + '" completo?', '', t.episodios + ' episodio(s) · ' + peso(t.pesoBytes) +
+        (t.pesoDesconocido ? ' (' + t.pesoDesconocido + ' sin peso)' : ''));
+      if (t.tipo === 'b2' || t.tipo === 'mixto') partes.push('', 'Los archivos se borran de Backblaze. No se puede recuperar.');
+      else if (t.tipo === 'torrent') partes.push('', 'Solo se quita el torrent del catálogo.');
+      else partes.push('', 'Solo se quita el enlace del catálogo.');
+    }
+    if (!window.confirm(partes.join('\n'))) return false;
+    try {
+      const cuerpo = Number.isFinite(season) ? { imdb: id, season, episode } : { imdb: id };
+      await api('/api/dash/propios/borrar', { method: 'POST', body: JSON.stringify(cuerpo) });
+      toast(Number.isFinite(season) ? 'Episodio eliminado' : 'Eliminado: ' + t.title);
+      await loadPropios();
+      loadPropiosResumen();
+      return true;
+    } catch (e) {
+      toast('No pude eliminar: ' + e.message, 'error');
+      return false;
+    }
+  }
+
+  const VISTA_KEY = 'central_vista';
+  const SCROLL_KEY = 'central_scroll';
+
+  function showView(id, opciones) {
+    const restaurar = opciones && opciones.restaurar;
+    const sinHistorial = opciones && (opciones.restaurar || opciones.sinHistorial);
+    const cambio = state.view !== id;
+    state.view = id;
+    $$('.view').forEach((v) => v.classList.toggle('active', v.id === 'view-' + id));
+    const navBtns = $$('#topTabs button, #bottomNav button');
+    if (navBtns.some((b) => b.dataset.view === id)) {
+      navBtns.forEach((b) => b.classList.toggle('active', b.dataset.view === id));
+    }
+    if (id === 'ahora' && state.activityTab === 'historial' && !state.history.length) loadHistory();
+    if (id === 'fuentes') { loadRefresh(); loadPropiosResumen(); }
+    if (id === 'propios') loadPropios();
+    if (state.data && (cambio || state.dirty[id])) renderView(id);
+    if (!restaurar) {
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+      try { localStorage.setItem(VISTA_KEY, id); localStorage.setItem(SCROLL_KEY, '0'); } catch (_) {}
+    }
+    // Cada pestaña queda en el historial: el botón atrás vuelve a la anterior.
+    if (!sinHistorial && location.hash !== '#' + id) {
+      history.pushState({ view: id }, '', '#' + id);
+    }
+  }
+
+  // Hojas y modales también entran al historial: atrás los cierra.
+  function abrirOverlay(nombre) {
+    if (state.overlay) return;
+    state.overlay = nombre;
+    history.pushState({ overlay: nombre, view: state.view }, '', location.hash || '#' + state.view);
+  }
+
+  function cerrarOverlay(nombre) {
+    if (state.overlay !== nombre) return false;
+    state.overlay = null;
+    return true;
+  }
+
+  window.addEventListener('popstate', (ev) => {
+    if (state.overlay) {
+      const n = state.overlay;
+      state.overlay = null;
+      if (n === 'search') closeSearch(true);
+      else if (n === 'propios') cerrarPropios(true);
+      else if (n === 'tier2') cerrarTier2(true);
+      else if (n === 'modal') closeModal(true);
+      return;
+    }
+    const st = ev.state || {};
+    const v = st.view || (location.hash || '').replace('#', '') || 'inicio';
+    if (document.getElementById('view-' + v)) showView(v, { restaurar: true, sinHistorial: true });
+  });
+
+  // Al recargar, vuelve a la misma vista y a la misma altura.
+  function recordarPosicion() {
+    try {
+      const y = window.scrollY || document.documentElement.scrollTop || 0;
+      localStorage.setItem(SCROLL_KEY, String(Math.round(y)));
+    } catch (_) {}
+  }
+  window.addEventListener('scroll', () => {
+    clearTimeout(window.__guardarScroll);
+    window.__guardarScroll = setTimeout(recordarPosicion, 250);
+  }, { passive: true });
+
+  // El resplandor del encabezado es CSS puro: una sola capa y solo anima
+  // opacidad y transform (no repinta). Se apaga desde Ajustes.
+  function aplicarGlow() {
+    const activo = !(state.data && state.data.settings && state.data.settings.heroAnimado === false);
+    document.body.classList.toggle('sin-glow', !activo);
+  }
+
+  function startTimer() {
+    if (state.timer) clearInterval(state.timer);
+    state.timer = setInterval(() => { if (!document.hidden) { loadState(true); loadBridge(); } }, 20000);
+  }
+
+  async function boot() {
+    try {
+      const data = await api('/api/dash/state');
+      state.data = data;
+      state.activity = data.activity || [];
+      let vista = 'inicio';
+      let y = 0;
+      try {
+        vista = localStorage.getItem(VISTA_KEY) || 'inicio';
+        y = Number(localStorage.getItem(SCROLL_KEY) || 0) || 0;
+      } catch (_) {}
+      if (!document.getElementById('view-' + vista)) vista = 'inicio';
+      state.view = vista;
+      try { history.replaceState({ view: vista }, '', '#' + vista); } catch (_) {}
+      showApp();
+      renderAll();
+      showView(vista, { restaurar: true });
+      if (y > 0) setTimeout(() => window.scrollTo(0, y), 350);
+      loadBridge();
+      loadRefresh();
+      startTimer();
+    } catch (_) {
+      showGate();
+    }
+  }
+
+  // ---------- events ----------
+  $('#gateForm').addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const token = $('#gateToken').value.trim();
+    if (!token) { $('#gateError').textContent = 'Escribe el token.'; return; }
+    $('#gateError').textContent = '';
+    try {
+      const r = await fetch('/api/dash/login', {
+        method: 'POST',
+        credentials: 'same-origin',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ token })
+      });
+      if (!r.ok) { $('#gateError').textContent = 'Token incorrecto.'; return; }
+      $('#gateToken').value = '';
+      await boot();
+      toast('Bienvenido');
+    } catch (err) {
+      $('#gateError').textContent = 'No pude entrar.';
+    }
+  });
+
+  const btnAbrirPropios = $('#btnOpenPropios');
+  if (btnAbrirPropios) btnAbrirPropios.addEventListener('click', () => showView('propios'));
+
+  // ---------- Capa 0: filas, hoja de episodios y borrado ----------
+  async function probarPropio(clave, boton) {
+    const previo = boton.textContent;
+    boton.textContent = '…';
+    try {
+      const r = await api('/api/dash/probe?q=' + encodeURIComponent(clave) + '&type=series');
+      boton.textContent = r.ok ? ('ok · ' + r.ms + ' ms') : 'falla';
+    } catch (_) { boton.textContent = 'falla'; }
+    setTimeout(() => { boton.textContent = previo; }, 4000);
+  }
+
+  $('#propiosList').addEventListener('click', (ev) => {
+    const abrir = ev.target.closest('[data-abrir-propios]');
+    if (abrir) { abrirPropios(abrir.dataset.abrirPropios); return; }
+    const borrar = ev.target.closest('[data-borrar-titulo]');
+    if (borrar) { borrarPropio(borrar.dataset.borrarTitulo); return; }
+  });
+
+  $('#propiosSheetBody').addEventListener('click', async (ev) => {
+    const probar = ev.target.closest('[data-probar]');
+    if (probar) { probarPropio(probar.dataset.probar, probar); return; }
+    const borrar = ev.target.closest('[data-borrar-ep]');
+    if (!borrar) return;
+    const [id, sNum, eNum] = borrar.dataset.borrarEp.split(':');
+    const ok = await borrarPropio(id, Number(sNum), Number(eNum));
+    if (ok && state.propiosAbierto) {
+      const t = (state.propios || []).find((x) => x.id === state.propiosAbierto.id);
+      if (!t) cerrarPropios();
+      else { state.propiosAbierto = t; renderEpisodiosPropios(t); }
+    }
+  });
+
+  $('#closePropiosSheet').addEventListener('click', cerrarPropios);
+  $('#propiosSheet').addEventListener('click', (e) => { if (e.target === $('#propiosSheet')) cerrarPropios(); });
+  $('#propiosEpFilter').addEventListener('input', () => {
+    if (state.propiosAbierto) renderEpisodiosPropios(state.propiosAbierto);
+  });
+  $('#btnSearch').addEventListener('click', openSearch);
+  $('#closeSearch').addEventListener('click', closeSearch);
+  $('#searchSheet').addEventListener('click', (e) => { if (e.target === $('#searchSheet')) closeSearch(); });
+  $('#searchInput').addEventListener('input', () => {
+    clearTimeout(state.searchTimer);
+    state.searchTimer = setTimeout(doSearch, 350);
+  });
+  $$('#searchType button').forEach((b) => b.addEventListener('click', () => {
+    state.searchType = b.dataset.type;
+    $$('#searchType button').forEach((x) => x.classList.toggle('active', x === b));
+    doSearch();
+  }));
+
+  $('#btnRefresh').addEventListener('click', async () => { await loadState(); await loadBridge(); });
+
+  $$('#topTabs button, #bottomNav button').forEach((b) => b.addEventListener('click', () => showView(b.dataset.view)));
+  $$('[data-go]').forEach((b) => b.addEventListener('click', () => showView(b.dataset.go)));
+
+  $('#activityTabs').addEventListener('click', (e) => {
+    const b = e.target.closest('button[data-tab]');
+    if (!b) return;
+    state.activityTab = b.dataset.tab;
+    $$('#activityTabs button').forEach((x) => x.classList.toggle('active', x === b));
+    if (state.activityTab === 'historial' && !state.history.length) loadHistory();
+    renderActivity();
+  });
+
+  $('#cacheFilter').addEventListener('input', (e) => { state.cacheFilter = e.target.value.trim(); state.cacheShown = 20; $('#cacheList').dataset.firma = ''; renderCache(); });
+  $('#cacheType').addEventListener('change', (e) => { state.cacheType = e.target.value; state.cacheShown = 20; $('#cacheList').dataset.firma = ''; renderCache(); });
+  $('#cacheList').addEventListener('click', (e) => {
+    const tb = e.target.closest('[data-tiempos]');
+    if (tb) {
+      const clave = tb.dataset.tiempos;
+      const caja = $('#cacheList').querySelector('[data-ttl="' + clave + '"]');
+      if (caja) {
+        const oculto = caja.toggleAttribute('hidden');
+        if (oculto) state.ttlAbiertos.delete(clave); else state.ttlAbiertos.add(clave);
+        tb.classList.toggle('activo', !oculto);
+      }
+      return;
+    }
+    const btn = e.target.closest('[data-action]');
+    if (!btn) return;
+    const g = state.cacheGroups.get(btn.dataset.group);
+    if (!g) return;
+    if (btn.dataset.action === 'extend') extendGroup(g);
+    else if (btn.dataset.action === 'delete') deleteGroup(g);
+    else if (btn.dataset.action === 'prewarm') openPrewarmSeries(g);
+  });
+
+  $('#btnBridgeTest').addEventListener('click', () => loadBridge(true));
+  $('#btnRefreshYandex').addEventListener('click', startRefresh);
+  $('#settingsForm').addEventListener('submit', saveSettings);
+  $$('#settingsForm input, #settingsForm select').forEach((el) => el.addEventListener('input', () => { state.settingsDirty = true; }));
+
+  $('#btnReset').addEventListener('click', () => {
+    openModal('Volver a valores por defecto', '<p class="muted" style="font-size:12px;line-height:1.6">Se restablecerán los ajustes de caché, ventana y reproducción. No se borra la caché.</p><div class="modal-actions"><button class="btn" data-close>Cancelar</button><button class="btn danger" id="confirmReset">Restablecer</button></div>');
+    $('#confirmReset').addEventListener('click', async () => {
+      closeModal();
+      try {
+        const r = await api('/api/dash/settings', { method: 'POST', body: JSON.stringify({ reset: true }) });
+        if (r.ok) { state.settingsDirty = false; toast('Ajustes restablecidos'); await loadState(true); }
+        else toast(r.error || 'No se pudo', 'error');
+      } catch (e) { toast(e.message, 'error'); }
+    });
+  });
+
+  $('#btnClearCache').addEventListener('click', () => {
+    openModal('Vaciar caché', '<p class="muted" style="font-size:12px;line-height:1.6">Se borrarán todas las listas guardadas. No se toca el catálogo ni los ajustes.</p><div class="modal-actions"><button class="btn" data-close>Cancelar</button><button class="btn danger" id="confirmClear">Vaciar</button></div>');
+    $('#confirmClear').addEventListener('click', async () => {
+      closeModal();
+      try { await api('/api/dash/action', { method: 'POST', body: JSON.stringify({ action: 'clear' }) }); toast('Caché vaciada'); await loadState(true); }
+      catch (e) { toast(e.message, 'error'); }
+    });
+  });
+
+  $('#btnClearActivity').addEventListener('click', () => {
+    openModal('Borrar historial', '<p class="muted" style="font-size:12px;line-height:1.6">Se borrarán los últimos 5 días de actividad. No se toca la caché ni el catálogo.</p><div class="modal-actions"><button class="btn" data-close>Cancelar</button><button class="btn danger" id="confirmActivity">Borrar</button></div>');
+    $('#confirmActivity').addEventListener('click', async () => {
+      closeModal();
+      try { await api('/api/dash/action', { method: 'POST', body: JSON.stringify({ action: 'activity-clear' }) }); state.history = []; state.historySummary = null; toast('Historial borrado'); await loadState(true); }
+      catch (e) { toast(e.message, 'error'); }
+    });
+  });
+
+  $('#btnLogout').addEventListener('click', () => logout(true));
+  $('#modalClose').addEventListener('click', closeModal);
+  $('#modal').addEventListener('click', (e) => { if (e.target === $('#modal')) closeModal(); });
+  document.addEventListener('keydown', (e) => { if (e.key === 'Escape') { closeModal(); closeSearch(); } });
+
+  const dado = document.createElement('button');
+  dado.id = 'demoDado';
+  dado.type = 'button';
+  dado.title = 'Regenerar datos de demo';
+  dado.innerHTML = '<svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true"><rect x="4" y="4" width="16" height="16" rx="4" fill="none" stroke="currentColor" stroke-width="1.7"/><circle cx="9" cy="9" r="1.4" fill="currentColor"/><circle cx="15" cy="9" r="1.4" fill="currentColor"/><circle cx="12" cy="12" r="1.4" fill="currentColor"/><circle cx="9" cy="15" r="1.4" fill="currentColor"/><circle cx="15" cy="15" r="1.4" fill="currentColor"/></svg>';
+  dado.addEventListener('click', async () => {
+    DEMO = generarDemo();
+    state.data = DEMO.state;
+    state.activity = DEMO.state.activity;
+    state.propios = DEMO.propios.lista;
+    state.dirty = {};
+    showApp();
+    renderAll();
+    loadPropiosResumen();
+    loadRefresh();
+    loadBridge();
+    toast('Datos de demo regenerados');
+  });
+  document.body.appendChild(dado);
+
+  boot();
+})();
+</script>
+<div class="t2-back" id="t2back"><div class="t2-card" id="t2card"></div></div>
+</body>
+</html>
