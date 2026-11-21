@@ -294,6 +294,10 @@
   .bar i{display:block;height:100%;border-radius:999px;background:linear-gradient(90deg,#8fa8c9,#dbe3ea);width:0;transition:width .35s}
   .idx-cards{display:grid;grid-template-columns:1fr;gap:8px}
   .idx-card{padding:10px;border:1px solid var(--line);border-radius:14px;background:rgba(12,10,9,.45)}
+  .idx-live{display:flex;align-items:center;gap:7px;margin-top:8px;padding:7px 9px;border-radius:10px;border:1px solid rgba(201,210,219,.18);background:rgba(201,210,219,.07);color:var(--silver,#c9d2db);font-size:10.5px;line-height:1.35}
+  .idx-live[hidden]{display:none}
+  .idx-live .icon{width:14px;height:14px;flex:0 0 auto;color:var(--cyan)}
+  .idx-live b{font-weight:600;letter-spacing:.01em}
   .idx-meta{display:flex;flex-wrap:wrap;gap:9px;margin-top:9px;font-size:10px;color:var(--muted)}
   .meta-item{display:inline-flex;align-items:center;gap:5px}
   .meta-item .icon{width:13px;height:13px;color:var(--cyan)}
@@ -603,7 +607,7 @@
 
       <div class="kpi-grid compact">
         <article class="kpi">
-          <div class="kpi-top"><span class="kpi-ico"><svg class="icon icon-sm"><use href="#i-movie"></use></svg></span><span class="kpi-label">Títulos</span></div>
+          <div class="kpi-top"><span class="kpi-ico"><svg class="icon icon-sm"><use href="#i-layers"></use></svg></span><span class="kpi-label">Enlaces</span></div>
           <div class="kpi-value" id="kpiTitulos">—</div>
           <div class="kpi-sub" id="kpiTitulosSub">indexados</div>
         </article>
@@ -720,6 +724,10 @@
                     <strong>Yandex</strong>
                     <span class="pulse ok" id="yandexBadge" title="En línea"></span>
                     <label class="switch" aria-label="Activar Yandex"><input type="checkbox" data-provider="yandex"><span></span></label>
+                  </div>
+                  <div class="idx-live" id="yLive" hidden>
+                    <svg class="icon icon-sm"><use href="#i-pulse"></use></svg>
+                    <span><b>Modo live activo</b> · índice no disponible; enlaces en vivo.</span>
                   </div>
                   <div class="stats">
                     <div class="stat"><svg class="icon icon-sm"><use href="#i-series"></use></svg><div><b id="ySeries">—</b><span>series</span></div></div>
@@ -1119,7 +1127,7 @@
       status: 'healthy',
       uptimeSec: demoRnd(3600, 90000),
       memory: { heapMB: demoRnd(110, 140), rssMB: demoRnd(300, 360), limitMB: 353 },
-      catalog: { titulos: 35439 },
+      catalog: { titulos: 35439, enlaces: 913698 },
       links: { confirmados: 120, caidos: 8 },
       cache: { streamsCount: 137 },
       metrics: { total: 245, ultimaHora: demoRnd(3, 20), promedioMs: 1289, tiers: [] },
@@ -1451,7 +1459,7 @@
     const d = state.data;
     const gnulaEnvOff = !!(d.sources && d.sources.gnula && d.sources.gnula.forzadoPorEntorno);
     const activas = Object.entries(d.providers || {}).filter(([k, v]) => v !== false && !(k === 'gnula' && gnulaEnvOff)).length;
-    $('#kpiTitulos').textContent = fmt(d.catalog.titulos);
+    $('#kpiTitulos').textContent = fmt(d.catalog.enlaces != null ? d.catalog.enlaces : d.catalog.titulos);
     $('#kpiTitulosSub').textContent = 'indexados';
     $('#kpiCache').textContent = fmt(d.cache.streamsCount);
     $('#kpiCacheSub').textContent = 'listas';
@@ -1727,8 +1735,10 @@
     if (yb) {
       const sano = !!(ix.cargado && Number(ix.series) > 0);
       yb.className = 'pulse ' + (sano ? 'ok' : 'bad');
-      yb.title = sano ? 'En línea' : 'Sin índice';
+      yb.title = sano ? 'En línea' : (ix.cargado ? 'Índice vacío' : 'Sin índice · modo live');
     }
+    const vivo = $('#yLive');
+    if (vivo) vivo.hidden = !!ix.cargado;
 
     // Última corrida: solo el tiempo, con icono.
     const ms = Number(r.fin_ts) ? Number(r.fin_ts) * 1000 : 0;
