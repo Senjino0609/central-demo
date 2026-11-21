@@ -93,6 +93,7 @@
   .kpi-label{font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:.07em;font-weight:700;line-height:1.2;white-space:nowrap}
   .kpi-value{font-size:26px;font-weight:800;letter-spacing:-.04em;line-height:1;font-variant-numeric:tabular-nums}
   .kpi-sub{font-size:10.5px;color:var(--muted-2);margin-top:5px}
+  .kpi-value .kpi-mil{font-size:11px;font-weight:600;letter-spacing:0;margin-left:3px;color:var(--muted-2)}
 
 
   /* ---------- sections ---------- */
@@ -1463,10 +1464,14 @@
     const kt = $('#kpiTitulos');
     const ks = $('#kpiTitulosSub');
     if (kt) {
-      // La unidad va en el subtítulo para que el número quepa en una línea.
+      // "mil" pequeño al lado del número: se lee completo y cabe en la tarjeta.
       const enMiles = enlaces >= 10000;
-      kt.textContent = enMiles ? Math.round(enlaces / 1000) : fmt(enlaces);
-      if (ks) ks.textContent = enMiles ? 'mil indexados' : 'indexados';
+      if (enMiles) {
+        kt.innerHTML = Math.round(enlaces / 1000) + ' <span class="kpi-mil">mil</span>';
+      } else {
+        kt.textContent = fmt(enlaces);
+      }
+      if (ks) ks.textContent = 'indexados';
       kt.title = fmt(enlaces) + ' enlaces indexados';
     }
 
