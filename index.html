@@ -1459,8 +1459,17 @@
     const d = state.data;
     const gnulaEnvOff = !!(d.sources && d.sources.gnula && d.sources.gnula.forzadoPorEntorno);
     const activas = Object.entries(d.providers || {}).filter(([k, v]) => v !== false && !(k === 'gnula' && gnulaEnvOff)).length;
-    $('#kpiTitulos').textContent = fmt(d.catalog.enlaces != null ? d.catalog.enlaces : d.catalog.titulos);
-    $('#kpiTitulosSub').textContent = 'indexados';
+    const enlaces = d.catalog.enlaces != null ? d.catalog.enlaces : d.catalog.titulos;
+    const kt = $('#kpiTitulos');
+    const ks = $('#kpiTitulosSub');
+    if (kt) {
+      // La unidad va en el subtítulo para que el número quepa en una línea.
+      const enMiles = enlaces >= 10000;
+      kt.textContent = enMiles ? Math.round(enlaces / 1000) : fmt(enlaces);
+      if (ks) ks.textContent = enMiles ? 'mil indexados' : 'indexados';
+      kt.title = fmt(enlaces) + ' enlaces indexados';
+    }
+
     $('#kpiCache').textContent = fmt(d.cache.streamsCount);
     $('#kpiCacheSub').textContent = 'listas';
     const totalFuentes = Object.keys(d.providers || {}).length;
